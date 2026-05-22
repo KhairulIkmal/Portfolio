@@ -176,12 +176,11 @@ function renderTimeline() {
 
     el.innerHTML = `
       <div class="tl-left">
+        <div class="tl-year">${escapeHTML(item.year)}</div>
         <div class="tl-role">${escapeHTML(item.role)}</div>
         <div class="tl-type">${escapeHTML(item.type)}</div>
       </div>
-      <div class="tl-center">
-        <div class="tl-year">${escapeHTML(item.year)}</div>
-      </div>
+      <div class="tl-center"></div>
       <div class="tl-right">
         <p class="tl-desc">${escapeHTML(item.desc)}</p>
       </div>
