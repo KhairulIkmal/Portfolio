@@ -662,24 +662,27 @@ em { color: var(--purple-2); font-style: normal; }
 /* ════════════════════════════════════════
    TIMELINE
 ════════════════════════════════════════ */
-.timeline-wrap { position: relative; }
+.timeline-wrap {
+  position: relative;
+  --tl-line-x: 50%; /* updated by JS to match col-3 center */
+}
 
-/* Base dim line */
+/* Base dim vertical line — pinned to col-3 center via JS-set var */
 .timeline-wrap::before {
   content: '';
   position: absolute;
-  left: 50%;
+  left: var(--tl-line-x);
   top: 0; bottom: 0;
   width: 1px;
-  background: rgba(139, 92, 246, 0.12);
   transform: translateX(-50%);
+  background: rgba(139, 92, 246, 0.12);
   z-index: 0;
 }
 
-/* Meteor trail — the glowing section above the dot */
+/* Meteor trail — left set by JS to match col-3 center */
 .tl-trail {
   position: absolute;
-  left: 50%;
+  left: 0; /* overridden by JS */
   top: 0;
   width: 2px;
   transform: translateX(-50%);
@@ -696,10 +699,10 @@ em { color: var(--purple-2); font-style: normal; }
   transition: height 0.05s linear;
 }
 
-/* Meteor dot — the glowing head */
+/* Meteor dot — left/top set by JS to match col-3 center */
 .tl-meteor {
   position: absolute;
-  left: 50%;
+  left: 0; /* overridden by JS */
   top: 0;
   transform: translate(-50%, -50%);
   width: 14px; height: 14px;
@@ -739,32 +742,19 @@ em { color: var(--purple-2); font-style: normal; }
   position: relative;
   z-index: 1;
   display: grid;
-  /* Left: year+role | narrow lane for line | right: desc */
-  grid-template-columns: 1fr 56px 1fr;
+  /*  col1: role+type  |  col2: year  |  col3: line lane  |  col4: desc  */
+  grid-template-columns: 1fr 200px 56px 1fr;
   align-items: flex-start;
   margin-bottom: 52px;
 }
 .timeline-item:last-child { margin-bottom: 0; }
 
-/* Left column — year on top, then role + type. Right-aligned so it ends well left of the line */
-.tl-left {
+/* Col 1 — role title + type (right-aligned) */
+.tl-role-col {
   text-align: right;
-  padding-right: 36px;
+  padding-right: 28px;
+  padding-top: 6px;
 }
-
-.tl-year {
-  font-size: 2.4rem;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-}
-.timeline-item:first-child .tl-year {
-  font-size: 1.6rem;
-  color: var(--purple-2);
-}
-
 .tl-role {
   font-size: 1.05rem;
   font-weight: 700;
@@ -777,13 +767,30 @@ em { color: var(--purple-2); font-style: normal; }
   font-weight: 500;
 }
 
-/* Center column — narrow empty lane, the vertical line passes through it */
-.tl-center { min-height: 10px; }
+/* Col 2 — year number (right-aligned, ends flush before col3) */
+.tl-year-col {
+  text-align: right;
+  padding-right: 16px;
+}
+.tl-year {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text-muted);
+}
+.timeline-item:first-child .tl-year {
+  font-size: 1.6rem;
+  color: var(--purple-2);
+}
 
-/* Right column — description */
-.tl-right {
-  padding-left: 36px;
-  padding-top: 4px;
+/* Col 3 — narrow empty lane, meteor & line live here */
+.tl-line-col { /* intentionally empty */ }
+
+/* Col 4 — description (left-aligned) */
+.tl-desc-col {
+  padding-left: 16px;
+  padding-top: 6px;
 }
 .tl-desc {
   font-size: 0.87rem;
@@ -792,23 +799,21 @@ em { color: var(--purple-2); font-style: normal; }
 }
 
 @media (max-width: 768px) {
-  .timeline-wrap::before { left: 20px; }
-  .tl-trail  { left: 20px; transform: none; }
-  .tl-meteor { left: 20px; }
   .timeline-item {
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: auto;
+    padding-left: 36px; /* indent content away from the left-edge line */
   }
-  .tl-left {
-    grid-column: 2;
-    text-align: left;
-    padding-right: 0;
-    padding-left: 16px;
-    padding-bottom: 8px;
-  }
-  .tl-center { display: none; }
-  .tl-right  { grid-column: 2; padding-left: 16px; }
-  .tl-year   { font-size: 1.1rem; color: var(--purple-2); margin-bottom: 6px; }
+  .tl-role-col { text-align: left; padding-right: 0; padding-bottom: 4px; }
+  .tl-year-col { text-align: left; padding-right: 0; order: -1; }
+  .tl-line-col { display: none; }
+  .tl-desc-col { padding-left: 0; }
+  .tl-year     { font-size: 1.1rem; color: var(--purple-2); margin-bottom: 4px; }
+
+  /* Repin line and meteor to left edge on mobile */
+  .timeline-wrap::before { left: 16px; transform: none; }
+  .tl-trail  { transform: translateX(-50%); }
+  .tl-meteor { transform: translate(-50%, -50%); }
 }
 
 /* ════════════════════════════════════════

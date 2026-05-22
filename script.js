@@ -175,13 +175,15 @@ function renderTimeline() {
     el.className = "timeline-item";
 
     el.innerHTML = `
-      <div class="tl-left">
-        <div class="tl-year">${escapeHTML(item.year)}</div>
+      <div class="tl-role-col">
         <div class="tl-role">${escapeHTML(item.role)}</div>
         <div class="tl-type">${escapeHTML(item.type)}</div>
       </div>
-      <div class="tl-center"></div>
-      <div class="tl-right">
+      <div class="tl-year-col">
+        <div class="tl-year">${escapeHTML(item.year)}</div>
+      </div>
+      <div class="tl-line-col"></div>
+      <div class="tl-desc-col">
         <p class="tl-desc">${escapeHTML(item.desc)}</p>
       </div>
     `;
@@ -252,33 +254,46 @@ function initTimelineMeteor() {
   const wrap = document.getElementById("timelineList");
   if (!wrap) return;
 
-  // Create trail (the glowing line above the meteor)
-  const trail = document.createElement("div");
-  trail.className = "tl-trail";
-  wrap.appendChild(trail);
-
-  // Create the meteor dot
+  // Create trail and meteor elements
+  const trail  = document.createElement("div");
   const meteor = document.createElement("div");
+  trail.className  = "tl-trail";
   meteor.className = "tl-meteor";
+  wrap.appendChild(trail);
   wrap.appendChild(meteor);
 
+  // Measure the CENTER of the line column (col 3) in px from wrap's left edge.
+  // This way the meteor sits exactly inside col 3 regardless of grid proportions.
+  function getLineX() {
+    const lineCol = wrap.querySelector(".tl-line-col");
+    if (lineCol) {
+      const colRect  = lineCol.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      return colRect.left - wrapRect.left + colRect.width / 2;
+    }
+    return wrap.offsetWidth / 2; // fallback
+  }
+
   function update() {
+    const x       = getLineX();
     const rect    = wrap.getBoundingClientRect();
     const wrapH   = wrap.offsetHeight;
 
-    // Anchor: meteor starts entering at top of section, finishes at bottom
-    // Use viewport 55% mark as the tracking point
-    const viewAnchor = window.innerHeight * 0.55;
+    // Sync the ::before base line to col 3 center via CSS variable
+    wrap.style.setProperty("--tl-line-x", x + "px");
+
+    // Progress: 0 when col enters viewport, 1 when it exits bottom
+    const viewAnchor  = window.innerHeight * 0.55;
     const distFromTop = viewAnchor - rect.top;
-    const progress = Math.max(0, Math.min(1, distFromTop / wrapH));
+    const progress    = Math.max(0, Math.min(1, distFromTop / wrapH));
+    const dotY        = progress * wrapH;
 
-    const dotY = progress * wrapH;
-
-    // Move meteor
-    meteor.style.top = dotY + "px";
-
-    // Grow the trail from top down to meteor position
+    // Position trail and meteor at the measured col-3 X
+    trail.style.left   = x + "px";
     trail.style.height = dotY + "px";
+
+    meteor.style.left  = x + "px";
+    meteor.style.top   = dotY + "px";
   }
 
   window.addEventListener("scroll", update, { passive: true });
