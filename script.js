@@ -262,43 +262,41 @@ function initTimelineMeteor() {
   wrap.appendChild(trail);
   wrap.appendChild(meteor);
 
-  // Measure the CENTER of the line column (col 3) in px from wrap's left edge.
-  // This way the meteor sits exactly inside col 3 regardless of grid proportions.
+  // Grid layout: 1fr 200px 56px 1fr
+  // Col3 center = 1fr + 200px + 28px, where 1fr = (wrapW - 256) / 2
+  // This avoids any DOM child measurement issues (GSAP transforms, render timing, etc.)
   function getLineX() {
-    const lineCol = wrap.querySelector(".tl-line-col");
-    if (lineCol) {
-      const colRect  = lineCol.getBoundingClientRect();
-      const wrapRect = wrap.getBoundingClientRect();
-      return colRect.left - wrapRect.left + colRect.width / 2;
-    }
-    return wrap.offsetWidth / 2; // fallback
+    if (window.innerWidth <= 768) return 16; // mobile uses fixed left edge
+    const wrapW = wrap.offsetWidth;
+    const oneFr = Math.max(0, (wrapW - 256) / 2); // 256 = 200 + 56
+    return oneFr + 228; // 200 (year col) + 28 (half of 56px line col)
   }
 
   function update() {
-    const x       = getLineX();
-    const rect    = wrap.getBoundingClientRect();
-    const wrapH   = wrap.offsetHeight;
+    const x     = getLineX();
+    const rect  = wrap.getBoundingClientRect();
+    const wrapH = wrap.offsetHeight;
 
     // Sync the ::before base line to col 3 center via CSS variable
     wrap.style.setProperty("--tl-line-x", x + "px");
 
-    // Progress: 0 when col enters viewport, 1 when it exits bottom
+    // Progress: 0 when section enters viewport, 1 when it exits bottom
     const viewAnchor  = window.innerHeight * 0.55;
     const distFromTop = viewAnchor - rect.top;
     const progress    = Math.max(0, Math.min(1, distFromTop / wrapH));
     const dotY        = progress * wrapH;
 
-    // Position trail and meteor at the measured col-3 X
+    // Position trail and meteor at col-3 centre X
     trail.style.left   = x + "px";
     trail.style.height = dotY + "px";
-
     meteor.style.left  = x + "px";
     meteor.style.top   = dotY + "px";
   }
 
+  // Double-raf ensures layout is fully painted before first measurement
+  requestAnimationFrame(() => requestAnimationFrame(update));
   window.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update, { passive: true });
-  update();
 }
 
 /* ════════════════════════════════════════
