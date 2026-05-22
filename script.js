@@ -183,7 +183,6 @@ function renderTimeline() {
       </div>
       <div class="tl-center">
         <div class="tl-year">${escapeHTML(item.year)}</div>
-        <div class="tl-dot"></div>
       </div>
       <div class="tl-right">
         <p class="tl-desc">${escapeHTML(item.desc)}</p>
@@ -249,6 +248,47 @@ function renderTechStack() {
     `;
     grid.appendChild(el);
   });
+}
+
+/* ════════════════════════════════════════
+   TIMELINE METEOR EFFECT
+════════════════════════════════════════ */
+function initTimelineMeteor() {
+  const wrap = document.getElementById("timelineList");
+  if (!wrap) return;
+
+  // Create trail (the glowing line above the meteor)
+  const trail = document.createElement("div");
+  trail.className = "tl-trail";
+  wrap.appendChild(trail);
+
+  // Create the meteor dot
+  const meteor = document.createElement("div");
+  meteor.className = "tl-meteor";
+  wrap.appendChild(meteor);
+
+  function update() {
+    const rect    = wrap.getBoundingClientRect();
+    const wrapH   = wrap.offsetHeight;
+
+    // Anchor: meteor starts entering at top of section, finishes at bottom
+    // Use viewport 55% mark as the tracking point
+    const viewAnchor = window.innerHeight * 0.55;
+    const distFromTop = viewAnchor - rect.top;
+    const progress = Math.max(0, Math.min(1, distFromTop / wrapH));
+
+    const dotY = progress * wrapH;
+
+    // Move meteor
+    meteor.style.top = dotY + "px";
+
+    // Grow the trail from top down to meteor position
+    trail.style.height = dotY + "px";
+  }
+
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update, { passive: true });
+  update();
 }
 
 /* ════════════════════════════════════════
@@ -378,6 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProjects();
   renderTechStack();
   initRoleCycle();
+  initTimelineMeteor();
   initNav();
   initScrollReveal();  // must run after all render calls
   initCursor();
