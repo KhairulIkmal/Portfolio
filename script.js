@@ -145,10 +145,9 @@ function renderServices() {
   const grid = document.getElementById("servicesGrid");
   if (!grid) return;
 
-  services.forEach((s, i) => {
+  services.forEach((s) => {
     const card = document.createElement("div");
     card.className = "service-card";
-    card.style.transitionDelay = `${i * 0.1}s`;
 
     card.innerHTML = `
       <div class="sc-tl"></div>
@@ -171,10 +170,9 @@ function renderTimeline() {
   const wrap = document.getElementById("timelineList");
   if (!wrap) return;
 
-  timeline.forEach((item, i) => {
+  timeline.forEach((item) => {
     const el = document.createElement("div");
     el.className = "timeline-item";
-    el.style.transitionDelay = `${i * 0.08}s`;
 
     el.innerHTML = `
       <div class="tl-left">
@@ -202,7 +200,6 @@ function renderProjects() {
   projects.forEach((p, i) => {
     const col = document.createElement("div");
     col.className = "project-col";
-    col.style.transitionDelay = `${i * 0.09}s`;
 
     const num = String(i + 1).padStart(2, "0");
     const githubBtn = p.github
@@ -233,10 +230,9 @@ function renderTechStack() {
   const grid = document.getElementById("techGrid");
   if (!grid) return;
 
-  techStack.forEach((item, i) => {
+  techStack.forEach((item) => {
     const el = document.createElement("div");
     el.className = "tech-item";
-    el.style.transitionDelay = `${i * 0.04}s`;
     el.title = item.name;
 
     el.innerHTML = `
@@ -324,30 +320,205 @@ function initRoleCycle() {
 }
 
 /* ════════════════════════════════════════
-   SCROLL REVEAL (IntersectionObserver)
+   SCROLL PROGRESS BAR
 ════════════════════════════════════════ */
-function initScrollReveal() {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
+function initScrollProgress() {
+  const bar = document.getElementById("scrollProgress");
+  if (!bar) return;
+  window.addEventListener("scroll", () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (window.scrollY / max * 100) + "%";
+  }, { passive: true });
+}
+
+/* ════════════════════════════════════════
+   GSAP ANIMATIONS
+════════════════════════════════════════ */
+function initGSAPAnimations() {
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+    // GSAP failed to load — fall back to simple reveal
+    document.querySelectorAll(".reveal, .service-card, .timeline-item, .project-col, .tech-item").forEach(el => {
+      el.style.opacity = "1";
+    });
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── Defaults ──────────────────────────────────────────────
+  gsap.defaults({ ease: "power3.out" });
+
+  // ── Hero entrance (on load, no scroll needed) ─────────────
+  const heroTl = gsap.timeline({ delay: 0.15 });
+  heroTl
+    .from(".hero-greeting",      { y: 30, opacity: 0, duration: 0.6 })
+    .from(".hero-name",          { y: 60, opacity: 0, duration: 0.9, ease: "power4.out" }, "-=0.3")
+    .from(".avatar-wrap",        { scale: 0.75, opacity: 0, duration: 1.1, ease: "back.out(1.4)" }, "-=0.55")
+    .from(".hero-role-prefix",   { y: 24, opacity: 0, duration: 0.55 }, "-=0.65")
+    .from(".role-current",       { y: 24, opacity: 0, duration: 0.65 }, "-=0.4")
+    .from(".social-sidebar",     { x: -30, opacity: 0, duration: 0.6 }, "-=0.5")
+    .from(".resume-fixed",       { y: 20, opacity: 0, duration: 0.5 }, "-=0.5")
+    .from(".nav-logo, .nav-email, .nav-links", { y: -20, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.6");
+
+  // ── Parallax on hero ambient orbs ─────────────────────────
+  gsap.to(".amb-orb--l", {
+    y: -180,
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 2 }
+  });
+  gsap.to(".amb-orb--r", {
+    y: -100,
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 2.5 }
+  });
+
+  // ── Section heading — clip-path wipe + translate ──────────
+  gsap.utils.toArray(".section-heading").forEach(el => {
+    gsap.from(el, {
+      y: 70,
+      opacity: 0,
+      clipPath: "inset(0 0 100% 0)",
+      duration: 1,
+      ease: "power4.out",
+      scrollTrigger: { trigger: el, start: "top 88%", once: true }
+    });
+  });
+
+  // ── Section label (ABOUT ME etc.) ─────────────────────────
+  gsap.utils.toArray(".section-label").forEach(el => {
+    gsap.from(el, {
+      x: -40,
+      opacity: 0,
+      duration: 0.65,
+      scrollTrigger: { trigger: el, start: "top 88%", once: true }
+    });
+  });
+
+  // ── About ─────────────────────────────────────────────────
+  gsap.from(".about-avatar-wrap", {
+    scale: 0.6,
+    opacity: 0,
+    duration: 1.1,
+    ease: "back.out(1.5)",
+    scrollTrigger: { trigger: "#about", start: "top 75%", once: true }
+  });
+
+  gsap.from(".about-bio", {
+    y: 50,
+    opacity: 0,
+    duration: 0.85,
+    stagger: 0.16,
+    scrollTrigger: { trigger: "#about", start: "top 72%", once: true }
+  });
+
+  gsap.from(".stat-item", {
+    x: 40,
+    opacity: 0,
+    duration: 0.5,
+    stagger: 0.1,
+    scrollTrigger: { trigger: ".about-stats", start: "top 88%", once: true }
+  });
+
+  // ── What I Do — background watermark parallax ─────────────
+  gsap.to(".what-bg-text", {
+    y: -120,
+    ease: "none",
+    scrollTrigger: { trigger: ".what-section", start: "top bottom", end: "bottom top", scrub: 1.5 }
+  });
+
+  // ── Service cards — slide in from right with stagger ──────
+  gsap.from(".service-card", {
+    x: 90,
+    opacity: 0,
+    duration: 0.75,
+    stagger: 0.14,
+    ease: "power3.out",
+    scrollTrigger: { trigger: ".services-grid", start: "top 82%", once: true }
+  });
+
+  // ── Timeline — alternate left / right ─────────────────────
+  gsap.utils.toArray(".timeline-item").forEach((item, i) => {
+    gsap.from(item, {
+      x: i % 2 === 0 ? -65 : 65,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power3.out",
+      scrollTrigger: { trigger: item, start: "top 86%", once: true }
+    });
+  });
+
+  // ── Projects — columns rise with stagger ──────────────────
+  gsap.from(".project-col", {
+    y: 80,
+    opacity: 0,
+    duration: 0.75,
+    stagger: 0.12,
+    ease: "power3.out",
+    scrollTrigger: { trigger: "#projects", start: "top 78%", once: true }
+  });
+
+  gsap.from(".projects-more", {
+    y: 30,
+    opacity: 0,
+    duration: 0.6,
+    scrollTrigger: { trigger: ".projects-more", start: "top 90%", once: true }
+  });
+
+  // ── Tech Stack — title letter-spacing reveal ───────────────
+  gsap.from(".tech-title", {
+    opacity: 0,
+    y: 50,
+    duration: 1,
+    ease: "power4.out",
+    scrollTrigger: { trigger: ".tech-section", start: "top 78%", once: true }
+  });
+
+  // Tech globe pulse-in
+  gsap.from(".tech-globe-inner", {
+    scale: 0,
+    opacity: 0,
+    duration: 1.4,
+    ease: "back.out(1.2)",
+    scrollTrigger: { trigger: ".tech-section", start: "top 78%", once: true }
+  });
+
+  // Tech items — pop in from center with stagger
+  gsap.from(".tech-item", {
+    scale: 0.3,
+    opacity: 0,
+    duration: 0.5,
+    stagger: {
+      each: 0.04,
+      from: "center",
     },
-    { threshold: 0.07, rootMargin: "0px 0px -28px 0px" }
-  );
+    ease: "back.out(1.6)",
+    scrollTrigger: { trigger: ".tech-grid", start: "top 82%", once: true }
+  });
 
-  const targets = [
-    ...document.querySelectorAll(".reveal"),
-    ...document.querySelectorAll(".service-card"),
-    ...document.querySelectorAll(".timeline-item"),
-    ...document.querySelectorAll(".project-col"),
-    ...document.querySelectorAll(".tech-item"),
-  ];
+  // ── Contact ───────────────────────────────────────────────
+  gsap.from(".contact-ctas .btn-cta", {
+    y: 40,
+    opacity: 0,
+    duration: 0.65,
+    stagger: 0.15,
+    scrollTrigger: { trigger: ".contact-ctas", start: "top 85%", once: true }
+  });
 
-  targets.forEach(el => observer.observe(el));
+  // Contact name — big clip-path reveal
+  gsap.from(".contact-name", {
+    y: 80,
+    opacity: 0,
+    clipPath: "inset(0 0 100% 0)",
+    duration: 1.1,
+    ease: "power4.out",
+    scrollTrigger: { trigger: ".contact-footer", start: "top 80%", once: true }
+  });
+
+  gsap.from(".contact-grid > div", {
+    y: 40,
+    opacity: 0,
+    duration: 0.7,
+    stagger: 0.12,
+    scrollTrigger: { trigger: ".contact-grid", start: "top 85%", once: true }
+  });
 }
 
 /* ════════════════════════════════════════
@@ -413,13 +584,17 @@ function escapeHTML(str) {
    INIT
 ════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
+  // Render dynamic content first — GSAP needs elements to exist
   renderServices();
   renderTimeline();
   renderProjects();
   renderTechStack();
+
+  // Features
   initRoleCycle();
   initTimelineMeteor();
   initNav();
-  initScrollReveal();  // must run after all render calls
+  initScrollProgress();
+  initGSAPAnimations();  // must run after render calls
   initCursor();
 });
