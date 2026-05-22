@@ -5,38 +5,38 @@
 const projects = [
   {
     name: "E-Library",
-    icon: "📚",
-    status: "live",
+    emoji: "📚",
+    category: "Full Stack / Web",
     description:
-      "Personal media library for anime, movies & books. Features YouTube trailer auto-play with geo-block detection via iframe API, Firebase wishlist sync, and debounced live search on home & explore pages.",
+      "Personal media library for anime, movies & books. Features YouTube trailer auto-play with geo-block detection, Firebase wishlist sync, and debounced live search.",
     tech: ["HTML", "CSS", "JavaScript", "Firebase", "TMDB API", "Jikan API"],
     github: "https://github.com/kaiii-dev/eLibrary",
     demo: null,
   },
   {
     name: "AgroEzuran",
-    icon: "🌱",
-    status: "in-dev",
+    emoji: "🌱",
+    category: "IoT / Mobile",
     description:
-      "IoT smart farm monitoring system with real-time sensor dashboards, device management, and a Flutter mobile companion app. Includes a React web frontend and a mobile-responsive admin panel.",
-    tech: ["React", "Vite", "Firebase", "Flutter", "Dart", "IoT"],
+      "IoT smart farm monitoring system with real-time sensor dashboards, device management, and a Flutter mobile companion app with React web frontend.",
+    tech: ["React", "Vite", "Firebase", "Flutter", "Dart", "ESP32"],
     github: "https://github.com/kaiii-dev/iot_smart_farm_web",
     demo: null,
   },
   {
-    name: "Project Three",
-    icon: "⚡",
-    status: "live",
+    name: "StudyFlow AI",
+    emoji: "🤖",
+    category: "AI / Full Stack",
     description:
-      "A placeholder for your next project. Edit the projects[] array in script.js to replace this with your real project details.",
-    tech: ["JavaScript", "Firebase", "CSS"],
+      "AI-powered study assistant that generates flashcards, summaries, and quizzes from uploaded notes. Built with Claude API and Firebase for real-time sync.",
+    tech: ["React", "Firebase", "Claude API", "Node.js"],
     github: null,
     demo: null,
   },
   {
     name: "Project Four",
-    icon: "🔧",
-    status: "in-dev",
+    emoji: "⚡",
+    category: "Full Stack",
     description:
       "Another placeholder project entry. Add your GitHub link and demo URL once your project is ready to showcase.",
     tech: ["React", "Node.js", "MongoDB"],
@@ -45,194 +45,151 @@ const projects = [
   },
 ];
 
-const skills = [
+const services = [
   {
-    category: "Programming Languages",
-    items: ["JavaScript", "Python", "Dart", "PHP", "C++"],
+    title: "FULL-STACK DEVELOPER",
+    sub: "Modern web development & scalable applications",
+    desc: "Building responsive and performant web applications using React, Vite, Node.js, and databases. Creating seamless user experiences with modern UI/UX principles.",
+    tags: ["React", "Vite", "Node.js", "Firebase", "TypeScript"],
   },
   {
-    category: "Frameworks & Libraries",
-    items: ["React", "Vite", "Tailwind CSS", "Express.js"],
+    title: "MOBILE DEVELOPER",
+    sub: "Cross-platform mobile applications",
+    desc: "Developing beautiful and performant mobile apps using Flutter and Dart. Integrating Firebase for real-time backends, authentication, and cloud storage.",
+    tags: ["Flutter", "Dart", "Firebase"],
   },
   {
-    category: "Mobile",
-    items: ["Flutter", "Firebase"],
-  },
-  {
-    category: "Tools & DevOps",
-    items: ["Git", "GitHub", "Vercel", "VS Code", "XAMPP"],
-  },
-  {
-    category: "APIs & Services",
-    items: ["TMDB API", "Jikan API", "MangaDex API", "YouTube iframe API"],
-  },
-  {
-    category: "IoT & Hardware",
-    items: ["ESP32", "Arduino", "MQTT"],
+    title: "IOT SYSTEMS",
+    sub: "Embedded systems & smart device integration",
+    desc: "Building IoT solutions with ESP32 and Arduino, connecting hardware to cloud services. Real-time sensor monitoring, device control, and data visualization.",
+    tags: ["ESP32", "Arduino", "MQTT", "C++", "React"],
   },
 ];
 
-// ── Replace with your real milestones ──
-const roadmap = [
+const timeline = [
   {
-    year: "2022",
-    title: "Started Diploma in Computer Science",
-    desc: "Began formal CS education, discovered a passion for web development and building things from scratch.",
-  },
-  {
-    year: "2023",
-    title: "Built First Full-Stack Web App",
-    desc: "Launched E-Library — a personal media library with Firebase, TMDB & Jikan API integration.",
-  },
-  {
-    year: "2024",
-    title: "IoT & Mobile Development",
-    desc: "Developed AgroEzuran, a smart farm monitoring system combining React, Flutter, Firebase & ESP32.",
+    year: "NOW",
+    role: "Learning Something New",
+    type: "Self-Development",
+    desc: "Continuously exploring emerging technologies, building AI-integrated apps, and pushing the boundaries of what's possible as a developer.",
   },
   {
     year: "2025",
-    title: "Open to Opportunities",
-    desc: "Actively seeking internship and junior developer roles in full-stack or mobile development.",
+    role: "Full-Stack + Mobile Dev",
+    type: "Freelance & Projects",
+    desc: "Building complete web and mobile applications. Developing IoT monitoring systems with Flutter, React, and Firebase backends.",
+  },
+  {
+    year: "2024",
+    role: "IoT Developer",
+    type: "Project Work",
+    desc: "Developed AgroEzuran smart farm system — ESP32 sensors, Flutter app, React dashboard, and real-time Firebase integration.",
+  },
+  {
+    year: "2023",
+    role: "Web Developer",
+    type: "Self-Taught & Projects",
+    desc: "Built first full-stack projects including E-Library. Learned JavaScript, React, Firebase, and REST API integration.",
+  },
+  {
+    year: "2022",
+    role: "Started CS Diploma",
+    type: "Education",
+    desc: "Began formal Computer Science education, discovered a passion for web development and building things from scratch.",
   },
 ];
 
-// ── Replace with your real education details ──
-const education = [
-  {
-    institution: "Your University / College",
-    degree: "Diploma in Computer Science",
-    years: "2022 – Present",
-    courses: ["Web Development", "Mobile Development", "IoT Systems", "Database Management"],
-  },
+const techStack = [
+  { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
+  { name: "Python",     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
+  { name: "Dart",       icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dart/dart-original.svg" },
+  { name: "PHP",        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/php/php-original.svg" },
+  { name: "C++",        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg" },
+  { name: "HTML",       icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" },
+  { name: "CSS",        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" },
+  { name: "React",      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
+  { name: "Vite",       icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vitejs/vitejs-original.svg" },
+  { name: "Tailwind",   icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
+  { name: "Flutter",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/flutter/flutter-original.svg" },
+  { name: "Firebase",   icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-plain.svg" },
+  { name: "Node.js",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
+  { name: "Express",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg" },
+  { name: "MongoDB",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
+  { name: "MySQL",      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" },
+  { name: "Git",        icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" },
+  { name: "GitHub",     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" },
+  { name: "VS Code",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg" },
+  { name: "Vercel",     icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vercel/vercel-original.svg" },
+  { name: "Arduino",    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/arduino/arduino-original.svg" },
+  { name: "Figma",      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg" },
+  { name: "Linux",      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" },
 ];
 
-// ── Replace with your real certifications ──
-const certifications = [
-  {
-    name: "Google Data Analytics Certificate",
-    issuer: "Google",
-    date: "2024",
-  },
-  {
-    name: "Networking Basics",
-    issuer: "Cisco",
-    date: "2023",
-  },
-  {
-    name: "SAS Programming Fundamentals",
-    issuer: "SAS",
-    date: "2023",
-  },
+const heroRoles = [
+  "Full-Stack Developer",
+  "Mobile Developer",
+  "IoT Engineer",
+  "Web Developer",
 ];
 
 /* ════════════════════════════════════════
    SVG ICONS
 ════════════════════════════════════════ */
-const ICON_GITHUB = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>`;
-
-const ICON_EXTERNAL = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-
-/* ════════════════════════════════════════
-   RENDER: ROADMAP
-════════════════════════════════════════ */
-function renderRoadmap() {
-  const list = document.getElementById("roadmapList");
-  if (!list) return;
-
-  roadmap.forEach((item, i) => {
-    const div = document.createElement("div");
-    div.className = "roadmap-item reveal";
-    div.style.transitionDelay = `${i * 0.1}s`;
-
-    div.innerHTML = `
-      <div class="roadmap-node">
-        <span class="roadmap-year">${escapeHTML(item.year)}</span>
-        <div class="roadmap-dot"></div>
-      </div>
-      <div class="roadmap-content">
-        <h4 class="roadmap-title">${escapeHTML(item.title)}</h4>
-        <p class="roadmap-desc">${escapeHTML(item.desc)}</p>
-      </div>
-    `;
-
-    list.appendChild(div);
-  });
-}
+const ICON_GITHUB = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>`;
+const ICON_EXTERNAL = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 
 /* ════════════════════════════════════════
-   RENDER: EDUCATION
+   RENDER: SERVICES (What I Do)
 ════════════════════════════════════════ */
-function renderEducation() {
-  const list = document.getElementById("educationList");
-  if (!list) return;
+function renderServices() {
+  const grid = document.getElementById("servicesGrid");
+  if (!grid) return;
 
-  education.forEach((edu, i) => {
+  services.forEach((s, i) => {
     const card = document.createElement("div");
-    card.className = "edu-card reveal";
+    card.className = "service-card";
     card.style.transitionDelay = `${i * 0.1}s`;
 
     card.innerHTML = `
-      <div class="edu-header">
-        <div>
-          <h3 class="edu-institution">${escapeHTML(edu.institution)}</h3>
-          <p class="edu-degree">${escapeHTML(edu.degree)}</p>
-        </div>
-        <span class="edu-years">${escapeHTML(edu.years)}</span>
-      </div>
-      <div class="edu-courses">
-        ${edu.courses.map(c => `<span class="skill-pill">${escapeHTML(c)}</span>`).join("")}
+      <div class="sc-tl"></div>
+      <div class="sc-br"></div>
+      <div class="service-title">${escapeHTML(s.title)}</div>
+      <div class="service-sub">${escapeHTML(s.sub)}</div>
+      <p class="service-desc">${escapeHTML(s.desc)}</p>
+      <div class="service-tags">
+        ${s.tags.map(t => `<span class="service-tag">${escapeHTML(t)}</span>`).join("")}
       </div>
     `;
-
-    list.appendChild(card);
-  });
-}
-
-/* ════════════════════════════════════════
-   RENDER: CERTIFICATIONS
-════════════════════════════════════════ */
-function renderCertifications() {
-  const grid = document.getElementById("certList");
-  if (!grid) return;
-
-  certifications.forEach((cert, i) => {
-    const card = document.createElement("div");
-    card.className = "cert-card reveal";
-    card.style.transitionDelay = `${i * 0.08}s`;
-
-    card.innerHTML = `
-      <div class="cert-icon">🏅</div>
-      <div class="cert-name">${escapeHTML(cert.name)}</div>
-      <div class="cert-meta">
-        <span class="cert-issuer">${escapeHTML(cert.issuer)}</span>
-        <span class="cert-date">${escapeHTML(cert.date)}</span>
-      </div>
-    `;
-
     grid.appendChild(card);
   });
 }
 
 /* ════════════════════════════════════════
-   RENDER: SKILLS
+   RENDER: TIMELINE
 ════════════════════════════════════════ */
-function renderSkills() {
-  const grid = document.getElementById("skillsGrid");
-  if (!grid) return;
+function renderTimeline() {
+  const wrap = document.getElementById("timelineList");
+  if (!wrap) return;
 
-  skills.forEach((group, i) => {
-    const div = document.createElement("div");
-    div.className = "skill-group reveal";
-    div.style.transitionDelay = `${i * 0.07}s`;
+  timeline.forEach((item, i) => {
+    const el = document.createElement("div");
+    el.className = "timeline-item";
+    el.style.transitionDelay = `${i * 0.08}s`;
 
-    div.innerHTML = `
-      <div class="skill-category">${escapeHTML(group.category)}</div>
-      <div class="skill-pills">
-        ${group.items.map(item => `<span class="skill-pill">${escapeHTML(item)}</span>`).join("")}
+    el.innerHTML = `
+      <div class="tl-left">
+        <div class="tl-role">${escapeHTML(item.role)}</div>
+        <div class="tl-type">${escapeHTML(item.type)}</div>
+      </div>
+      <div class="tl-center">
+        <div class="tl-year">${escapeHTML(item.year)}</div>
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-right">
+        <p class="tl-desc">${escapeHTML(item.desc)}</p>
       </div>
     `;
-
-    grid.appendChild(div);
+    wrap.appendChild(el);
   });
 }
 
@@ -244,78 +201,90 @@ function renderProjects() {
   if (!grid) return;
 
   projects.forEach((p, i) => {
-    const card = document.createElement("div");
-    card.className = "project-card reveal";
-    card.style.transitionDelay = `${i * 0.1}s`;
+    const col = document.createElement("div");
+    col.className = "project-col";
+    col.style.transitionDelay = `${i * 0.09}s`;
 
-    const badgeClass = p.status === "live" ? "badge-live" : "badge-dev";
-    const badgeLabel = p.status === "live" ? "Live" : "In Dev";
-
+    const num = String(i + 1).padStart(2, "0");
     const githubBtn = p.github
-      ? `<a href="${p.github}" target="_blank" rel="noopener" class="project-link">${ICON_GITHUB} GitHub</a>`
+      ? `<a href="${p.github}" target="_blank" rel="noopener" class="proj-link">${ICON_GITHUB} GitHub</a>`
       : "";
-
     const demoBtn = p.demo
-      ? `<a href="${p.demo}" target="_blank" rel="noopener" class="project-link">${ICON_EXTERNAL} Live Demo</a>`
+      ? `<a href="${p.demo}" target="_blank" rel="noopener" class="proj-link">${ICON_EXTERNAL} Live Demo</a>`
       : "";
 
-    card.innerHTML = `
-      <div class="project-header">
-        <div style="display:flex;flex-direction:column;gap:6px;flex:1">
-          <div class="project-icon">${p.icon || "⚡"}</div>
-          <span class="project-name">${escapeHTML(p.name)}</span>
-        </div>
-        <span class="project-badge ${badgeClass}">${badgeLabel}</span>
+    col.innerHTML = `
+      <span class="proj-num">${num}</span>
+      <div class="proj-name">${escapeHTML(p.name)}</div>
+      <div class="proj-category">${escapeHTML(p.category)}</div>
+      <div class="proj-img">${p.emoji || "⚡"}</div>
+      <div class="proj-tools">
+        ${p.tech.map(t => `<span class="proj-tool">${escapeHTML(t)}</span>`).join("")}
       </div>
-      <p class="project-desc">${escapeHTML(p.description)}</p>
-      <div class="project-tech">
-        ${p.tech.map(t => `<span class="tech-pill">${escapeHTML(t)}</span>`).join("")}
-      </div>
-      <div class="project-links">${githubBtn}${demoBtn}</div>
+      <div class="proj-links">${githubBtn}${demoBtn}</div>
     `;
-
-    grid.appendChild(card);
+    grid.appendChild(col);
   });
 }
 
 /* ════════════════════════════════════════
-   TYPEWRITER
+   RENDER: TECH STACK
 ════════════════════════════════════════ */
-function initTypewriter() {
-  const typedName   = document.getElementById("typedName");
-  const blinkCursor = document.getElementById("blinkCursor");
-  if (!typedName || !blinkCursor) return;
+function renderTechStack() {
+  const grid = document.getElementById("techGrid");
+  if (!grid) return;
 
-  const fullName = "Kai Dev";
-  let index = 0;
+  techStack.forEach((item, i) => {
+    const el = document.createElement("div");
+    el.className = "tech-item";
+    el.style.transitionDelay = `${i * 0.04}s`;
+    el.title = item.name;
 
-  function type() {
-    if (index < fullName.length) {
-      typedName.textContent += fullName[index++];
-      setTimeout(type, 85);
-    } else {
-      setTimeout(() => {
-        blinkCursor.classList.add("done");
-        revealHeroSequence();
-      }, 550);
-    }
-  }
-
-  setTimeout(type, 900);
-}
-
-function revealHeroSequence() {
-  const elements = ["heroRole", "heroDesc", "heroActions", "heroScroll"];
-  elements.forEach((id, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) el.classList.add("visible");
-    }, i * 170);
+    el.innerHTML = `
+      <div class="tech-icon">
+        <img src="${item.icon}" alt="${escapeHTML(item.name)}" loading="lazy"
+          onerror="this.parentElement.innerHTML='<span style=\\'font-size:1.4rem\\'>${item.name.slice(0,2)}</span>'" />
+      </div>
+      <div class="tech-name">${escapeHTML(item.name)}</div>
+    `;
+    grid.appendChild(el);
   });
 }
 
 /* ════════════════════════════════════════
-   SCROLL REVEAL (Intersection Observer)
+   HERO ROLE CYCLE
+════════════════════════════════════════ */
+function initRoleCycle() {
+  const roleCurrent  = document.getElementById("roleCurrent");
+  const roleOutgoing = document.getElementById("roleOutgoing");
+  if (!roleCurrent || !roleOutgoing) return;
+
+  let idx = 0;
+
+  setInterval(() => {
+    const next = heroRoles[(idx + 1) % heroRoles.length];
+
+    // Show outgoing (current fading out)
+    roleOutgoing.textContent = roleCurrent.textContent;
+    roleOutgoing.style.opacity = "0.35";
+
+    // Swap current
+    roleCurrent.style.opacity = "0";
+    setTimeout(() => {
+      roleCurrent.textContent = next;
+      roleCurrent.classList.remove("entering");
+      void roleCurrent.offsetWidth; // force reflow
+      roleCurrent.classList.add("entering");
+      roleCurrent.style.opacity = "1";
+      roleOutgoing.style.opacity = "0";
+    }, 350);
+
+    idx = (idx + 1) % heroRoles.length;
+  }, 3200);
+}
+
+/* ════════════════════════════════════════
+   SCROLL REVEAL (IntersectionObserver)
 ════════════════════════════════════════ */
 function initScrollReveal() {
   const observer = new IntersectionObserver(
@@ -327,28 +296,36 @@ function initScrollReveal() {
         }
       });
     },
-    { threshold: 0.08, rootMargin: "0px 0px -32px 0px" }
+    { threshold: 0.07, rootMargin: "0px 0px -28px 0px" }
   );
 
-  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+  const targets = [
+    ...document.querySelectorAll(".reveal"),
+    ...document.querySelectorAll(".service-card"),
+    ...document.querySelectorAll(".timeline-item"),
+    ...document.querySelectorAll(".project-col"),
+    ...document.querySelectorAll(".tech-item"),
+  ];
+
+  targets.forEach(el => observer.observe(el));
 }
 
 /* ════════════════════════════════════════
-   NAV
+   NAV SCROLL EFFECT
 ════════════════════════════════════════ */
 function initNav() {
-  const nav       = document.getElementById("nav");
-  const navMenu   = document.getElementById("navMenu");
-  const navMobile = document.getElementById("navMobile");
+  const nav     = document.getElementById("nav");
+  const burger  = document.getElementById("navMenu");
+  const drawer  = document.getElementById("navDrawer");
 
-  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 20);
+  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 30);
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  navMenu.addEventListener("click", () => navMobile.classList.toggle("open"));
+  burger.addEventListener("click", () => drawer.classList.toggle("open"));
 
-  document.querySelectorAll(".nav-mobile-link").forEach(link => {
-    link.addEventListener("click", () => navMobile.classList.remove("open"));
+  document.querySelectorAll(".nav-drawer-link").forEach(link => {
+    link.addEventListener("click", () => drawer.classList.remove("open"));
   });
 }
 
@@ -357,50 +334,30 @@ function initNav() {
 ════════════════════════════════════════ */
 function initCursor() {
   const cursor = document.getElementById("cursor");
-  const trail  = document.getElementById("cursorTrail");
-  if (!cursor || !trail) return;
-
+  if (!cursor) return;
   if (!window.matchMedia("(hover: hover)").matches) return;
 
-  let mouseX = 0, mouseY = 0;
-  let trailX = 0, trailY = 0;
+  let mx = 0, my = 0;
 
   document.addEventListener("mousemove", e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    cursor.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+    mx = e.clientX;
+    my = e.clientY;
+    cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
   }, { passive: true });
 
-  function animateTrail() {
-    trailX += (mouseX - trailX) * 0.11;
-    trailY += (mouseY - trailY) * 0.11;
-    trail.style.transform = `translate(${trailX}px, ${trailY}px) translate(-50%, -50%)`;
-    requestAnimationFrame(animateTrail);
-  }
-  animateTrail();
-
   document.addEventListener("mouseover", e => {
-    if (e.target.closest("a, button, .project-card, .skill-pill, .btn, .cert-card")) {
-      cursor.classList.add("hover");
-      trail.classList.add("hover");
+    if (e.target.closest("a, button, .project-col, .service-card, .tech-item, .btn-cta, .btn-see-more")) {
+      cursor.classList.add("big");
     }
   });
-
   document.addEventListener("mouseout", e => {
-    if (e.target.closest("a, button, .project-card, .skill-pill, .btn, .cert-card")) {
-      cursor.classList.remove("hover");
-      trail.classList.remove("hover");
+    if (e.target.closest("a, button, .project-col, .service-card, .tech-item, .btn-cta, .btn-see-more")) {
+      cursor.classList.remove("big");
     }
   });
 
-  document.addEventListener("mouseleave", () => {
-    cursor.style.opacity = "0";
-    trail.style.opacity  = "0";
-  });
-  document.addEventListener("mouseenter", () => {
-    cursor.style.opacity = "1";
-    trail.style.opacity  = "1";
-  });
+  document.addEventListener("mouseleave", () => { cursor.style.opacity = "0"; });
+  document.addEventListener("mouseenter", () => { cursor.style.opacity = "1"; });
 }
 
 /* ════════════════════════════════════════
@@ -416,13 +373,12 @@ function escapeHTML(str) {
    INIT
 ════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
-  renderRoadmap();
-  renderEducation();
-  renderSkills();
-  renderCertifications();
+  renderServices();
+  renderTimeline();
   renderProjects();
-  initTypewriter();
+  renderTechStack();
+  initRoleCycle();
   initNav();
-  initScrollReveal();  // Must be after render calls so .reveal elements exist
+  initScrollReveal();  // must run after all render calls
   initCursor();
 });
