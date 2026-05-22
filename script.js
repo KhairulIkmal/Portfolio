@@ -69,33 +69,33 @@ const services = [
 const timeline = [
   {
     year: "NOW",
-    role: "Learning Something New",
-    type: "Self-Development",
-    desc: "Continuously exploring emerging technologies, building AI-integrated apps, and pushing the boundaries of what's possible as a developer.",
+    role: "Software Engineering Student",
+    type: "UTHM • CGPA 3.7",
+    desc: "Pursuing Bachelor of Computer Science (Software Engineering) at Universiti Tun Hussein Onn Malaysia. Seeking internship opportunities August 2026 – January 2027.",
   },
   {
     year: "2025",
-    role: "Full-Stack + Mobile Dev",
-    type: "Freelance & Projects",
-    desc: "Building complete web and mobile applications. Developing IoT monitoring systems with Flutter, React, and Firebase backends.",
+    role: "Gold Award Winner",
+    type: "DINS 2025 • UTHM",
+    desc: "Won Gold Award & Best Presentation Award at Digital Innovathon Symposium 2025 (DINS 2025). Competed at PutraHack Hackathon 2026 at Universiti Putra Malaysia.",
   },
   {
     year: "2024",
-    role: "IoT Developer",
-    type: "Project Work",
-    desc: "Developed AgroEzuran smart farm system — ESP32 sensors, Flutter app, React dashboard, and real-time Firebase integration.",
+    role: "Liquipedia Editor",
+    type: "Community • Global",
+    desc: "Editor/Reviewer at Liquipedia Global Esports Wiki — managing large-scale datasets, ensuring data accuracy for a global esports audience using Markdown/Wiki-syntax.",
   },
   {
     year: "2023",
-    role: "Web Developer",
-    type: "Self-Taught & Projects",
-    desc: "Built first full-stack projects including E-Library. Learned JavaScript, React, Firebase, and REST API integration.",
+    role: "Started Degree",
+    type: "Education • UTHM",
+    desc: "Enrolled in Bachelor of Computer Science (Software Engineering) at UTHM. Previously graduated Foundation in Science Physical from KMJ with CGPA 3.98.",
   },
   {
     year: "2022",
-    role: "Started CS Diploma",
-    type: "Education",
-    desc: "Began formal Computer Science education, discovered a passion for web development and building things from scratch.",
+    role: "Foundation Studies",
+    type: "KMJ • CGPA 3.98",
+    desc: "Completed Foundation in Science Physical at Kolej Matrikulasi Johor. Discovered a passion for programming and software development.",
   },
 ];
 
@@ -555,6 +555,89 @@ function initGSAPAnimations() {
   // ── Defaults ──────────────────────────────────────────────
   gsap.defaults({ ease: "power3.out" });
 
+  // ── Per-section varied scroll transitions ─────────────────
+  // Each section gets a unique enter + leave effect
+
+  const sectionEffects = [
+    // #about — subtle zoom out
+    {
+      id: "#about",
+      enter: { from: { scale: 1.06 },            to: { scale: 1    } },
+      leave: { from: { scale: 1    },            to: { scale: 0.96 } },
+    },
+    // #what-i-do — slide up, no scale
+    {
+      id: "#what-i-do",
+      enter: { from: { y: 60 },                  to: { y: 0        } },
+      leave: { from: { x: 0  },                  to: { x: -40      } },
+    },
+    // #experience — slide in from right
+    {
+      id: "#experience",
+      enter: { from: { x: 80  },                 to: { x: 0        } },
+      leave: { from: { scale: 1 },               to: { scale: 0.96 } },
+    },
+    // #projects — very subtle zoom out
+    {
+      id: "#projects",
+      enter: { from: { scale: 1.06 },            to: { scale: 1    } },
+      leave: { from: { y: 0        },            to: { y: -50      } },
+    },
+    // #skills — slight tilt only
+    {
+      id: "#skills",
+      enter: { from: { scale: 0.94, rotate: -1 }, to: { scale: 1, rotate: 0 } },
+      leave: { from: { scale: 1    },             to: { scale: 0.96 } },
+    },
+  ];
+
+  sectionEffects.forEach(({ id, enter, leave }) => {
+    const el = document.querySelector(id);
+    if (!el) return;
+
+    // Enter
+    gsap.fromTo(el, enter.from, {
+      ...enter.to,
+      ease: "none",
+      scrollTrigger: {
+        trigger: el,
+        start: "top bottom",
+        end:   "top top",
+        scrub: 1.2,
+      }
+    });
+
+    // Leave
+    gsap.fromTo(el, leave.from, {
+      ...leave.to,
+      ease: "none",
+      scrollTrigger: {
+        trigger: el,
+        start: "bottom bottom",
+        end:   "bottom top",
+        scrub: 1.2,
+      }
+    });
+  });
+
+  // Contact — last section, use shorter range so animation completes
+  const contactEl = document.querySelector("#contact");
+  if (contactEl) {
+    gsap.fromTo(contactEl,
+      { y: 80 },
+      {
+        y: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: contactEl,
+          start: "top bottom",
+          end:   "top 60%",   // finishes early — doesn't need full scroll room
+          scrub: 1.2,
+        }
+      }
+    );
+  }
+
   // ── Hero entrance (on load, no scroll needed) ─────────────
   const heroTl = gsap.timeline({ delay: 0.15 });
   heroTl
@@ -585,7 +668,7 @@ function initGSAPAnimations() {
       clipPath: "inset(0 0 100% 0)",
       duration: 1,
       ease: "power4.out",
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" }
+      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
     });
   });
 
@@ -595,7 +678,7 @@ function initGSAPAnimations() {
       x: -40,
       opacity: 0,
       duration: 0.65,
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" }
+      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
     });
   });
 
@@ -605,15 +688,14 @@ function initGSAPAnimations() {
     opacity: 0,
     duration: 1.1,
     ease: "back.out(1.5)",
-    scrollTrigger: { trigger: "#about", start: "top 75%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: "#about", start: "top 75%", toggleActions: "play none none none" }
   });
 
   gsap.from(".about-bio", {
-    y: 50,
-    opacity: 0,
+    y: 40,
     duration: 0.85,
     stagger: 0.16,
-    scrollTrigger: { trigger: "#about", start: "top 72%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: "#about", start: "top 80%", toggleActions: "play none none none" }
   });
 
   gsap.from(".stat-item", {
@@ -621,7 +703,7 @@ function initGSAPAnimations() {
     opacity: 0,
     duration: 0.5,
     stagger: 0.1,
-    scrollTrigger: { trigger: ".about-stats", start: "top 88%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".about-stats", start: "top 88%", toggleActions: "play none none none" }
   });
 
   // ── What I Do — background watermark parallax ─────────────
@@ -638,7 +720,7 @@ function initGSAPAnimations() {
     duration: 0.75,
     stagger: 0.14,
     ease: "power3.out",
-    scrollTrigger: { trigger: ".services-grid", start: "top 82%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".services-grid", start: "top 82%", toggleActions: "play none none none" }
   });
 
   // ── Timeline — alternate left / right ─────────────────────
@@ -648,7 +730,7 @@ function initGSAPAnimations() {
       opacity: 0,
       duration: 0.8,
       ease: "power3.out",
-      scrollTrigger: { trigger: item, start: "top 86%", toggleActions: "play none none reverse" }
+      scrollTrigger: { trigger: item, start: "top 86%", toggleActions: "play none none none" }
     });
   });
 
@@ -659,14 +741,14 @@ function initGSAPAnimations() {
     duration: 0.75,
     stagger: 0.12,
     ease: "power3.out",
-    scrollTrigger: { trigger: "#projects", start: "top 78%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: "#projects", start: "top 78%", toggleActions: "play none none none" }
   });
 
   gsap.from(".projects-more", {
     y: 30,
     opacity: 0,
     duration: 0.6,
-    scrollTrigger: { trigger: ".projects-more", start: "top 90%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".projects-more", start: "top 90%", toggleActions: "play none none none" }
   });
 
   // ── Tech Stack — title reveal ─────────────────────────────
@@ -675,14 +757,14 @@ function initGSAPAnimations() {
     y: 40,
     duration: 1,
     ease: "power4.out",
-    scrollTrigger: { trigger: ".tech-section", start: "top 78%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".tech-section", start: "top 78%", toggleActions: "play none none none" }
   });
   gsap.from(".sphere-stage", {
     opacity: 0,
     scale: 0.85,
     duration: 1.2,
     ease: "back.out(1.4)",
-    scrollTrigger: { trigger: ".tech-section", start: "top 72%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".tech-section", start: "top 72%", toggleActions: "play none none none" }
   });
 
   // ── Contact ───────────────────────────────────────────────
@@ -691,7 +773,7 @@ function initGSAPAnimations() {
     opacity: 0,
     duration: 0.65,
     stagger: 0.15,
-    scrollTrigger: { trigger: ".contact-ctas", start: "top 85%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".contact-ctas", start: "top 85%", toggleActions: "play none none none" }
   });
 
   // Contact name — big clip-path reveal
@@ -701,7 +783,7 @@ function initGSAPAnimations() {
     clipPath: "inset(0 0 100% 0)",
     duration: 1.1,
     ease: "power4.out",
-    scrollTrigger: { trigger: ".contact-footer", start: "top 80%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".contact-footer", start: "top 80%", toggleActions: "play none none none" }
   });
 
   gsap.from(".contact-grid > div", {
@@ -709,7 +791,7 @@ function initGSAPAnimations() {
     opacity: 0,
     duration: 0.7,
     stagger: 0.12,
-    scrollTrigger: { trigger: ".contact-grid", start: "top 85%", toggleActions: "play none none reverse" }
+    scrollTrigger: { trigger: ".contact-grid", start: "top 85%", toggleActions: "play none none none" }
   });
 }
 
