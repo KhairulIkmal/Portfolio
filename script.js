@@ -138,12 +138,6 @@ const techStack = [
   { name: "Linux",      icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" },
 ];
 
-const heroRoles = [
-  "Full-Stack Developer",
-  "Mobile Developer",
-  "IoT Engineer",
-  "Web Developer",
-];
 
 /* ════════════════════════════════════════
    SVG ICONS
@@ -561,38 +555,30 @@ function initTimelineMeteor() {
 /* ════════════════════════════════════════
    HERO ROLE CYCLE
 ════════════════════════════════════════ */
-function initRoleCycle() {
-  const roleCurrent  = document.getElementById("roleCurrent");
-  const roleOutgoing = document.getElementById("roleOutgoing");
-  if (!roleCurrent || !roleOutgoing) return;
-
-  let idx = 0;
-
-  setInterval(() => {
-    const next = heroRoles[(idx + 1) % heroRoles.length];
-
-    // Show outgoing (current fading out)
-    roleOutgoing.textContent = roleCurrent.textContent;
-    roleOutgoing.style.opacity = "0.35";
-
-    // Swap current
-    roleCurrent.style.opacity = "0";
-    setTimeout(() => {
-      roleCurrent.textContent = next;
-      roleCurrent.classList.remove("entering");
-      void roleCurrent.offsetWidth; // force reflow
-      roleCurrent.classList.add("entering");
-      roleCurrent.style.opacity = "1";
-      roleOutgoing.style.opacity = "0";
-    }, 350);
-
-    idx = (idx + 1) % heroRoles.length;
-  }, 3200);
-}
 
 /* ════════════════════════════════════════
    SCROLL PROGRESS BAR
 ════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   HERO ROLE CYCLE
+════════════════════════════════════════ */
+function initRoleCycle() {
+  const el = document.getElementById("heroRole");
+  if (!el) return;
+  const roles = ["Full-Stack Developer", "Mobile Developer", "IoT System Driven", "Web Developer"];
+  let idx = 0;
+  setInterval(() => {
+    el.classList.add("role-fade-out");
+    setTimeout(() => {
+      idx = (idx + 1) % roles.length;
+      el.textContent = roles[idx];
+      el.classList.remove("role-fade-out");
+      el.classList.add("role-fade-in");
+      setTimeout(() => el.classList.remove("role-fade-in"), 400);
+    }, 300);
+  }, 2800);
+}
+
 function initScrollProgress() {
   const bar = document.getElementById("scrollProgress");
   if (!bar) return;
@@ -1051,9 +1037,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initTechSphere();
 
   // Features
-  initRoleCycle();
   initTimelineMeteor();
   initNav();
+  initRoleCycle();
   initScrollProgress();
   initGSAPAnimations();  // must run after render calls
   initMagneticButtons();
