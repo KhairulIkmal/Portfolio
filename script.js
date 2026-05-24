@@ -37,6 +37,7 @@ const projects = [
     name: "StudyFlow AI",
     emoji: "🤖",
     category: "AI / Full Stack",
+    wip: true,
     description:
       "AI-powered study assistant that generates flashcards, summaries, and quizzes from uploaded notes. Built with Claude API and Firebase for real-time sync.",
     tech: ["React", "Firebase", "Claude API", "Node.js"],
@@ -212,7 +213,7 @@ function renderProjects() {
 
     col.innerHTML = `
       <span class="proj-num">${num}</span>
-      <div class="proj-name">${escapeHTML(p.name)}</div>
+      <div class="proj-name">${escapeHTML(p.name)}${p.wip ? '<span class="proj-wip">WIP</span>' : ""}</div>
       <div class="proj-category">${escapeHTML(p.category)}</div>
       <div class="proj-img">${p.emoji || "⚡"}</div>
       <div class="proj-tools">
@@ -904,6 +905,47 @@ function initCursor() {
 }
 
 /* ════════════════════════════════════════
+   CONTACT FORM
+════════════════════════════════════════ */
+function initContactForm() {
+  const form = document.getElementById("contactForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector(".form-submit");
+    const original = btn.textContent;
+    btn.textContent = "Sending...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      });
+
+      if (res.ok) {
+        form.innerHTML = `<div class="form-success">✓ Message sent! I'll get back to you soon.</div>`;
+      } else {
+        throw new Error();
+      }
+    } catch {
+      // Fallback: open email client with form data pre-filled
+      const name    = form.querySelector('[name="name"]')?.value    || "";
+      const email   = form.querySelector('[name="email"]')?.value   || "";
+      const message = form.querySelector('[name="message"]')?.value || "";
+      window.location.href =
+        `mailto:Ikmal03411@gmail.com` +
+        `?subject=${encodeURIComponent("Portfolio Contact from " + name)}` +
+        `&body=${encodeURIComponent(message + "\n\nFrom: " + email)}`;
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  });
+}
+
+/* ════════════════════════════════════════
    UTILITY
 ════════════════════════════════════════ */
 function escapeHTML(str) {
@@ -928,6 +970,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initScrollProgress();
   initGSAPAnimations();  // must run after render calls
+  initContactForm();
   initTorch();
   initCursor();
 });
