@@ -270,7 +270,10 @@ function renderProjects() {
   const grid = document.getElementById("projectsGrid");
   if (!grid) return;
 
-  projects.forEach((p, i) => {
+  const isProjectsPage = document.body.dataset.page === "projects";
+  const toRender = isProjectsPage ? projects : projects.filter(p => p.featured);
+
+  toRender.forEach((p, i) => {
     const col = document.createElement("div");
     col.className = "project-col";
 
@@ -281,12 +284,16 @@ function renderProjects() {
     const demoBtn = p.demo
       ? `<a href="${p.demo}" target="_blank" rel="noopener" class="proj-link">${ICON_EXTERNAL} Live Demo</a>`
       : "";
+    const descHtml = isProjectsPage && p.description
+      ? `<p class="proj-desc">${escapeHTML(p.description)}</p>`
+      : "";
 
     col.innerHTML = `
       <span class="proj-num">${num}</span>
       <div class="proj-name">${escapeHTML(p.name)}${p.wip ? '<span class="proj-wip">WIP</span>' : ""}</div>
       <div class="proj-category">${escapeHTML(p.category)}</div>
       <div class="proj-img">${p.emoji || "⚡"}</div>
+      ${descHtml}
       <div class="proj-tools">
         ${p.tech.map(t => `<span class="proj-tool">${escapeHTML(t)}</span>`).join("")}
       </div>
