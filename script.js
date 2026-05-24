@@ -5,6 +5,7 @@
 const projects = [
   {
     name: "Taska Zurah Attendance",
+    featured: true,
     emoji: "👶",
     category: "Mobile / IoT",
     description:
@@ -15,6 +16,7 @@ const projects = [
   },
   {
     name: "AgroEzuran",
+    featured: true,
     emoji: "🌱",
     category: "IoT / Mobile",
     description:
@@ -25,6 +27,7 @@ const projects = [
   },
   {
     name: "Halfday Cafe POS",
+    featured: true,
     emoji: "☕",
     category: "Full Stack / Web",
     description:
@@ -64,18 +67,28 @@ const services = [
     sub: "Modern web development & scalable applications",
     desc: "Building responsive and performant web applications using React, Vite, Node.js, and databases. Creating seamless user experiences with modern UI/UX principles.",
     tags: ["React", "Vite", "Node.js", "Firebase", "TypeScript"],
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
   },
   {
     title: "MOBILE DEVELOPER",
     sub: "Cross-platform mobile applications",
     desc: "Developing beautiful and performant mobile apps using Flutter and Dart. Integrating Firebase for real-time backends, authentication, and cloud storage.",
     tags: ["Flutter", "Dart", "Firebase"],
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+  },
+  {
+    title: "UI/UX DESIGN",
+    sub: "User-centred design & prototyping",
+    desc: "Designing clean, intuitive interfaces with a focus on user experience. From wireframes to high-fidelity prototypes, ensuring every interaction feels natural and purposeful.",
+    tags: ["Figma", "Prototyping", "Wireframing", "Design Systems"],
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>`,
   },
   {
     title: "IOT SYSTEMS",
     sub: "Embedded systems & smart device integration",
     desc: "Building IoT solutions with ESP32 and Arduino, connecting hardware to cloud services. Real-time sensor monitoring, device control, and data visualization.",
     tags: ["ESP32", "Arduino", "MQTT", "C++", "React"],
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>`,
   },
 ];
 
@@ -203,14 +216,18 @@ function renderServices() {
   const grid = document.getElementById("servicesGrid");
   if (!grid) return;
 
-  services.forEach((s) => {
+  services.forEach((s, i) => {
     const card = document.createElement("div");
     card.className = "service-card";
+    const num = String(i + 1).padStart(2, "0");
 
     card.innerHTML = `
       <div class="sc-tl"></div>
       <div class="sc-br"></div>
+      <div class="service-num">${num}</div>
+      <div class="service-icon">${s.icon || ""}</div>
       <div class="service-title">${escapeHTML(s.title)}</div>
+      <div class="service-hint">HOVER TO EXPAND ↓</div>
       <div class="service-sub">${escapeHTML(s.sub)}</div>
       <p class="service-desc">${escapeHTML(s.desc)}</p>
       <div class="service-tags">
@@ -233,15 +250,12 @@ function renderTimeline() {
     el.className = "timeline-item";
 
     el.innerHTML = `
-      <div class="tl-role-col">
+      <div class="tl-card">
+        <div class="tl-card-header">
+          <span class="tl-year">${escapeHTML(item.year)}</span>
+          <span class="tl-type">${escapeHTML(item.type)}</span>
+        </div>
         <div class="tl-role">${escapeHTML(item.role)}</div>
-        <div class="tl-type">${escapeHTML(item.type)}</div>
-      </div>
-      <div class="tl-year-col">
-        <div class="tl-year">${escapeHTML(item.year)}</div>
-      </div>
-      <div class="tl-line-col"></div>
-      <div class="tl-desc-col">
         <p class="tl-desc">${escapeHTML(item.desc)}</p>
       </div>
     `;
@@ -515,14 +529,8 @@ function initTimelineMeteor() {
   wrap.appendChild(trail);
   wrap.appendChild(meteor);
 
-  // Grid layout: 1fr 200px 56px 1fr
-  // Col3 center = 1fr + 200px + 28px, where 1fr = (wrapW - 256) / 2
-  // This avoids any DOM child measurement issues (GSAP transforms, render timing, etc.)
   function getLineX() {
-    if (window.innerWidth <= 768) return 16; // mobile uses fixed left edge
-    const wrapW = wrap.offsetWidth;
-    const oneFr = Math.max(0, (wrapW - 256) / 2); // 256 = 200 + 56
-    return oneFr + 228; // 200 (year col) + 28 (half of 56px line col)
+    return 24; // fixed left-side line position
   }
 
   function update() {
@@ -591,6 +599,15 @@ function initScrollProgress() {
 /* ════════════════════════════════════════
    GSAP ANIMATIONS
 ════════════════════════════════════════ */
+function initSectionFade() {
+  const els = document.querySelectorAll(".section-fade");
+  if (!els.length) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  els.forEach(el => obs.observe(el));
+}
+
 function initGSAPAnimations() {
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
     // GSAP failed to load — fall back to simple reveal
@@ -1040,6 +1057,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTimelineMeteor();
   initNav();
   initRoleCycle();
+  initSectionFade();
   initScrollProgress();
   initGSAPAnimations();  // must run after render calls
   initMagneticButtons();
