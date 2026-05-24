@@ -46,6 +46,18 @@ const projects = [
   },
 ];
 
+const certificates = [
+  { name: "Dean's List Student",                     issuer: "UTHM",                img: "https://www.uthm.edu.my/media/yootheme/cache/89/logo-uthm-200px-png-8904065d.png", whiteBg: true, size: 42 },
+  { name: "CCNA: Introduction to Networks",          issuer: "CISCO",               img: "https://cdn.simpleicons.org/cisco/60a5fa" },
+  { name: "SAS Viya Overview",                       issuer: "SAS",                 img: "https://www.vectorlogo.zone/logos/sas/sas-icon.svg" },
+  { name: "AWS Academy Workshop",                    issuer: "AMAZON WEB SERVICES", img: "assets/aws.svg" },
+  { name: "Machine Learning Using SAS Viya",         issuer: "SAS",                 img: "https://www.vectorlogo.zone/logos/sas/sas-icon.svg" },
+  { name: "Aruba Instant AP (IAP) Configuration",    issuer: "HPE ARUBA",           img: "https://cdn.worldvectorlogo.com/logos/aruba-networks.svg" },
+  { name: "Data Literacy in Practice",               issuer: "SAS",                 img: "https://www.vectorlogo.zone/logos/sas/sas-icon.svg" },
+  { name: "Gemini Certified University Student",     issuer: "GOOGLE",              img: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
+  { name: "Data Literacy Essentials",                issuer: "SAS",                 img: "https://www.vectorlogo.zone/logos/sas/sas-icon.svg" },
+];
+
 const services = [
   {
     title: "FULL-STACK DEVELOPER",
@@ -138,6 +150,57 @@ const heroRoles = [
 ════════════════════════════════════════ */
 const ICON_GITHUB = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>`;
 const ICON_EXTERNAL = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+/* ════════════════════════════════════════
+   RENDER: CERTIFICATES MARQUEE
+════════════════════════════════════════ */
+function certLogoError(el) {
+  const initials = el.alt.split(" ").map(w => w[0]).join("").slice(0, 3);
+  el.style.display = "none";
+  const badge = document.createElement("span");
+  badge.className = "cert-badge";
+  badge.style.background = "linear-gradient(135deg,#334155,#1e293b)";
+  badge.textContent = initials;
+  el.insertAdjacentElement("afterend", badge);
+}
+
+function renderCertificates() {
+  const row1 = document.getElementById("certRow1");
+  const row2 = document.getElementById("certRow2");
+  if (!row1 || !row2) return;
+
+  // Repeat 4× so content is always wider than any screen → seamless -50% loop
+  const repeated = [...certificates, ...certificates, ...certificates, ...certificates];
+
+  const badgeColors = {
+    SAS: "linear-gradient(135deg,#1B6CA8,#0D4F8A)",
+    HPE: "linear-gradient(135deg,#01A982,#016B52)",
+    AWS: "linear-gradient(135deg,#FF9900,#c47400)",
+  };
+  const iconHTML = c => {
+    if (c.img) {
+      const size = c.size ? `width:${c.size}px;height:${c.size}px;` : '';
+      const bg   = c.whiteBg ? 'background:#fff;border-radius:6px;padding:3px;' : '';
+      const style = (size || bg) ? ` style="${size}${bg}"` : '';
+      return `<img class="cert-logo" src="${c.img}" alt="${escapeHTML(c.issuer)}" loading="lazy" onerror="certLogoError(this)"${style} />`;
+    }
+    if (c.badge) return `<span class="cert-badge" style="background:${badgeColors[c.badge] || badgeColors.SAS}">${escapeHTML(c.badge)}</span>`;
+    return "";
+  };
+
+  const html = repeated.map(c => `
+    <div class="cert-item">
+      ${iconHTML(c)}
+      <div>
+        <div class="cert-name">${escapeHTML(c.name)}</div>
+        <div class="cert-issuer">${escapeHTML(c.issuer)}</div>
+      </div>
+    </div>
+  `).join("");
+
+  row1.innerHTML = html;
+  row2.innerHTML = html;
+}
 
 /* ════════════════════════════════════════
    RENDER: SERVICES (What I Do)
@@ -661,138 +724,135 @@ function initGSAPAnimations() {
     scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 2.5 }
   });
 
-  // ── Section heading — clip-path wipe + translate ──────────
+  // ── Section headings — 3D rotateX scrub ─────────────────
   gsap.utils.toArray(".section-heading").forEach(el => {
-    gsap.from(el, {
-      y: 70,
-      opacity: 0,
-      clipPath: "inset(0 0 100% 0)",
-      duration: 1,
-      ease: "power4.out",
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
-    });
+    gsap.fromTo(el,
+      { rotateX: 45, y: 50, opacity: 0, transformPerspective: 900, transformOrigin: "50% 100%" },
+      { rotateX: 0, y: 0, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 92%", end: "top 45%", scrub: 1.2 }
+      }
+    );
   });
 
-  // ── Section label (ABOUT ME etc.) ─────────────────────────
+  // ── Section labels ────────────────────────────────────────
   gsap.utils.toArray(".section-label").forEach(el => {
-    gsap.from(el, {
-      x: -40,
-      opacity: 0,
-      duration: 0.65,
-      scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none none" }
-    });
+    gsap.fromTo(el,
+      { x: -40, opacity: 0 },
+      { x: 0, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 92%", end: "top 65%", scrub: 1 }
+      }
+    );
   });
 
-  // ── About ─────────────────────────────────────────────────
-  gsap.from(".about-avatar-wrap", {
-    scale: 0.6,
-    opacity: 0,
-    duration: 1.1,
-    ease: "back.out(1.5)",
-    scrollTrigger: { trigger: "#about", start: "top 75%", toggleActions: "play none none none" }
+  // ── About avatar — 3D rotateY spin scrub ─────────────────
+  gsap.fromTo(".about-avatar-wrap",
+    { scale: 0.6, opacity: 0, rotateY: -90, transformPerspective: 600 },
+    { scale: 1, opacity: 1, rotateY: 0, ease: "power2.out",
+      scrollTrigger: { trigger: "#about", start: "top 85%", end: "top 20%", scrub: 1.2 }
+    }
+  );
+
+  // ── About bio — scrub per paragraph ──────────────────────
+  gsap.utils.toArray(".about-bio").forEach(el => {
+    gsap.fromTo(el,
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 92%", end: "top 65%", scrub: 1 }
+      }
+    );
   });
 
-  gsap.from(".about-bio", {
-    y: 40,
-    duration: 0.85,
-    stagger: 0.16,
-    scrollTrigger: { trigger: "#about", start: "top 80%", toggleActions: "play none none none" }
-  });
-
-  gsap.from(".stat-item", {
-    x: 40,
-    opacity: 0,
-    duration: 0.5,
-    stagger: 0.1,
-    scrollTrigger: { trigger: ".about-stats", start: "top 88%", toggleActions: "play none none none" }
+  // ── Stat items — scrub per row ────────────────────────────
+  gsap.utils.toArray(".stat-item").forEach(el => {
+    gsap.fromTo(el,
+      { x: 40, opacity: 0, rotateX: 20, transformPerspective: 500, transformOrigin: "50% 0%" },
+      { x: 0, opacity: 1, rotateX: 0, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 95%", end: "top 70%", scrub: 1 }
+      }
+    );
   });
 
   // ── What I Do — background watermark parallax ─────────────
   gsap.to(".what-bg-text", {
-    y: -120,
-    ease: "none",
+    y: -120, ease: "none",
     scrollTrigger: { trigger: ".what-section", start: "top bottom", end: "bottom top", scrub: 1.5 }
   });
 
-  // ── Service cards — slide in from right with stagger ──────
-  gsap.from(".service-card", {
-    x: 90,
-    opacity: 0,
-    duration: 0.75,
-    stagger: 0.14,
-    ease: "power3.out",
-    scrollTrigger: { trigger: ".services-grid", start: "top 82%", toggleActions: "play none none none" }
+  // ── Service cards — 3D rotateY scrub per card ────────────
+  gsap.utils.toArray(".service-card").forEach(el => {
+    gsap.fromTo(el,
+      { x: 100, opacity: 0, rotateY: -18, transformPerspective: 800, transformOrigin: "0% 50%" },
+      { x: 0, opacity: 1, rotateY: 0, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 92%", end: "top 50%", scrub: 1.2 }
+      }
+    );
   });
 
-  // ── Timeline — alternate left / right ─────────────────────
+  // ── Timeline — 3D rotateY scrub per item ─────────────────
   gsap.utils.toArray(".timeline-item").forEach((item, i) => {
-    gsap.from(item, {
-      x: i % 2 === 0 ? -65 : 65,
-      opacity: 0,
-      duration: 0.8,
-      ease: "power3.out",
-      scrollTrigger: { trigger: item, start: "top 86%", toggleActions: "play none none none" }
-    });
+    gsap.fromTo(item,
+      { x: i % 2 === 0 ? -70 : 70, opacity: 0, rotateY: i % 2 === 0 ? -22 : 22, transformPerspective: 700 },
+      { x: 0, opacity: 1, rotateY: 0, ease: "power2.out",
+        scrollTrigger: { trigger: item, start: "top 92%", end: "top 50%", scrub: 1.2 }
+      }
+    );
   });
 
-  // ── Projects — columns rise with stagger ──────────────────
-  gsap.from(".project-col", {
-    y: 80,
-    opacity: 0,
-    duration: 0.75,
-    stagger: 0.12,
-    ease: "power3.out",
-    scrollTrigger: { trigger: "#projects", start: "top 78%", toggleActions: "play none none none" }
+  // ── Projects — 3D rotateX scrub per card ─────────────────
+  gsap.utils.toArray(".project-col").forEach(el => {
+    gsap.fromTo(el,
+      { y: 90, opacity: 0, rotateX: 28, transformPerspective: 800, transformOrigin: "50% 0%" },
+      { y: 0, opacity: 1, rotateX: 0, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 95%", end: "top 40%", scrub: 1.2 }
+      }
+    );
   });
 
-  gsap.from(".projects-more", {
-    y: 30,
-    opacity: 0,
-    duration: 0.6,
-    scrollTrigger: { trigger: ".projects-more", start: "top 90%", toggleActions: "play none none none" }
-  });
+  gsap.fromTo(".projects-more",
+    { y: 30, opacity: 0 },
+    { y: 0, opacity: 1, ease: "power2.out",
+      scrollTrigger: { trigger: ".projects-more", start: "top 95%", end: "top 75%", scrub: 1 }
+    }
+  );
 
-  // ── Tech Stack — title reveal ─────────────────────────────
-  gsap.from(".tech-title", {
-    opacity: 0,
-    y: 40,
-    duration: 1,
-    ease: "power4.out",
-    scrollTrigger: { trigger: ".tech-section", start: "top 78%", toggleActions: "play none none none" }
-  });
-  gsap.from(".sphere-stage", {
-    opacity: 0,
-    scale: 0.85,
-    duration: 1.2,
-    ease: "back.out(1.4)",
-    scrollTrigger: { trigger: ".tech-section", start: "top 72%", toggleActions: "play none none none" }
-  });
+  // ── Tech Stack — scrub ────────────────────────────────────
+  gsap.fromTo(".tech-title",
+    { opacity: 0, y: 40 },
+    { opacity: 1, y: 0, ease: "power2.out",
+      scrollTrigger: { trigger: ".tech-section", start: "top 88%", end: "top 55%", scrub: 1 }
+    }
+  );
+  gsap.fromTo(".sphere-stage",
+    { opacity: 0, scale: 0.8, rotateX: 30, transformPerspective: 900 },
+    { opacity: 1, scale: 1, rotateX: 0, ease: "power2.out",
+      scrollTrigger: { trigger: ".tech-section", start: "top 82%", end: "top 20%", scrub: 1.2 }
+    }
+  );
 
   // ── Contact ───────────────────────────────────────────────
-  gsap.from(".contact-ctas .btn-cta", {
-    y: 40,
-    opacity: 0,
-    duration: 0.65,
-    stagger: 0.15,
-    scrollTrigger: { trigger: ".contact-ctas", start: "top 85%", toggleActions: "play none none none" }
+  gsap.utils.toArray(".contact-ctas .btn-cta").forEach(el => {
+    gsap.fromTo(el,
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 95%", end: "top 70%", scrub: 1 }
+      }
+    );
   });
 
-  // Contact name — big clip-path reveal
-  gsap.from(".contact-name", {
-    y: 80,
-    opacity: 0,
-    clipPath: "inset(0 0 100% 0)",
-    duration: 1.1,
-    ease: "power4.out",
-    scrollTrigger: { trigger: ".contact-footer", start: "top 80%", toggleActions: "play none none none" }
-  });
+  gsap.fromTo(".contact-name",
+    { rotateX: 40, y: 70, opacity: 0, transformPerspective: 1000, transformOrigin: "50% 100%" },
+    { rotateX: 0, y: 0, opacity: 1, ease: "power2.out",
+      scrollTrigger: { trigger: ".contact-footer", start: "top 88%", end: "top 35%", scrub: 1.2 }
+    }
+  );
 
-  gsap.from(".contact-grid > div", {
-    y: 40,
-    opacity: 0,
-    duration: 0.7,
-    stagger: 0.12,
-    scrollTrigger: { trigger: ".contact-grid", start: "top 85%", toggleActions: "play none none none" }
+  gsap.utils.toArray(".contact-grid > div").forEach(el => {
+    gsap.fromTo(el,
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 95%", end: "top 70%", scrub: 1 }
+      }
+    );
   });
 }
 
@@ -905,6 +965,31 @@ function initCursor() {
 }
 
 /* ════════════════════════════════════════
+   MAGNETIC BUTTONS
+════════════════════════════════════════ */
+function initMagneticButtons() {
+  if (!window.matchMedia("(hover: hover)").matches) return;
+
+  document.querySelectorAll(".btn-cta, .btn-see-more").forEach(btn => {
+    btn.addEventListener("mouseenter", () => {
+      btn.style.transition = "transform 0.15s ease, background var(--ease), border-color var(--ease), color var(--ease)";
+    });
+
+    btn.addEventListener("mousemove", e => {
+      const r  = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width  / 2);
+      const dy = e.clientY - (r.top  + r.height / 2);
+      btn.style.transform = `translate(${dx * 0.35}px, ${dy * 0.35}px)`;
+    });
+
+    btn.addEventListener("mouseleave", () => {
+      btn.style.transition = "transform 0.6s cubic-bezier(0.23,1,0.32,1), background var(--ease), border-color var(--ease), color var(--ease)";
+      btn.style.transform  = "";
+    });
+  });
+}
+
+/* ════════════════════════════════════════
    CONTACT FORM
 ════════════════════════════════════════ */
 function initContactForm() {
@@ -959,6 +1044,7 @@ function escapeHTML(str) {
 ════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
   // Render dynamic content first — GSAP needs elements to exist
+  renderCertificates();
   renderServices();
   renderTimeline();
   renderProjects();
@@ -970,6 +1056,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initNav();
   initScrollProgress();
   initGSAPAnimations();  // must run after render calls
+  initMagneticButtons();
   initContactForm();
   initTorch();
   initCursor();

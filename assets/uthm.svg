@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="UTHM">
+  <circle cx="40" cy="40" r="38" fill="#003580"/>
+  <circle cx="40" cy="40" r="38" fill="none" stroke="#FFB300" stroke-width="3"/>
+  <text x="40" y="46" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="18" fill="#FFB300" text-anchor="middle" letter-spacing="1">UTHM</text>
+</svg>
