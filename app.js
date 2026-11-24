@@ -867,6 +867,19 @@ function initChips() {
 }
 
 // Logbook: an oscilloscope trace that draws itself as you scroll.
+function initLogLogos() {
+  document.querySelectorAll('#logList li[data-logo]').forEach((li) => {
+    const plate = document.createElement('span');
+    plate.className = 'plate plate-xs';
+    plate.setAttribute('aria-hidden', 'true');
+    const img = document.createElement('img');
+    img.src = li.dataset.logo; img.alt = '';
+    if (li.dataset.crop === 'top') img.className = 'crop-top';
+    plate.appendChild(img);
+    li.children[1].prepend(plate);
+  });
+}
+
 function initScope() {
   const list = document.getElementById('logList');
   const svg = document.getElementById('scopeSvg');
@@ -881,6 +894,8 @@ function initScope() {
       title: strong.replace(/\.$/, ''),
       detail: li.children[1].textContent.replace(strong, '').trim(),
       kind: li.dataset.kind,
+      logo: li.dataset.logo || '',
+      crop: li.dataset.crop || '',
     };
   });
   const HEIGHT = { Gold: 165, Experience: 140, Hackathon: 118, Leadership: 96, Education: 78, Community: 68 };
@@ -919,11 +934,14 @@ function initScope() {
   });
 
   const [rYear, rTitle, rDetail] = ['.scope-year', '.scope-title', '.scope-detail'].map((s) => read.querySelector(s));
+  const rLogo = read.querySelector('.scope-logo');
+  const rLogoImg = rLogo && rLogo.querySelector('img');
   let active = -1, hover = -1, shown = -2;
   function show(i) {
     if (i === shown) return;
     shown = i;
     marks.forEach((m, k) => m.classList.toggle('on', k === i));
+    if (rLogo) { const it = items[i]; rLogo.hidden = !(it && it.logo); if (it && it.logo) { rLogoImg.src = it.logo; rLogoImg.className = it.crop === 'top' ? 'crop-top' : ''; } }
     if (i < 0) { rYear.textContent = 'Signal idle'; rTitle.textContent = 'Scroll to scan'; rDetail.textContent = 'Each spike is a milestone. Gold awards spike highest.'; return; }
     const it = items[i];
     rYear.textContent = `${it.year} · ${it.kind}`;
@@ -995,6 +1013,7 @@ function initUI() {
   initCounters();
   initTabs();
   initChips();
+  initLogLogos();
   initScope();
   initPinout();
 }

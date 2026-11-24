@@ -379,3 +379,12 @@ main, .bar, .foot { position: relative; z-index: 1; }
   .card .tabs [role="tabpanel"] { animation: none; }
   .ic-body, .ic-desc { transition: none; }
 }
+
+/* logos on light plates, so every logo reads the same on the dark theme */
+.plate { display: inline-flex; align-items: center; justify-content: center; flex: none; background: #ede9e0; border-radius: 6px; padding: 6px; height: 64px; box-sizing: border-box; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.plate img { display: block; height: 100%; width: auto; }
+.plate img.crop-top { width: auto; height: 100%; aspect-ratio: 190 / 52; object-fit: cover; object-position: 50% 100%; }
+.plate-sm { height: 46px; padding: 5px 7px; align-self: flex-start; margin-bottom: 12px; }
+.plate-xs { height: 30px; padding: 3px 5px; border-radius: 4px; margin-right: 10px; vertical-align: middle; box-shadow: none; }
+.card-head { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+.card-head h3 { margin: 0; }
