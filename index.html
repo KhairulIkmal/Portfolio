@@ -114,10 +114,25 @@
       </div></div>
     </section>
 
+    <section class="sec work" data-state="oled">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 02 / 04</span><span>Family business</span></p>
+          <figure class="card-fig missing"><img src="assets/work/dapur-kayu-mak/cover.jpg" alt="Dapur Kayu Mak online store" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/dapur-kayu-mak/cover.jpg</figcaption></figure>
+          <h3 class="disp">Dapur Kayu Mak</h3>
+          <p class="card-award mono">Live · Online store + back office</p>
+          <p>An online store and back office for my family’s small snack business, selling kerepek pisang, rempeyek, gift packs and kenduri orders. Customers shop in Bahasa Melayu and pay by DuitNow QR, while the back office runs orders, payment reconciliation, inventory, raw materials, recipe costing and production, with an audit log on every change.</p>
+          <ul class="chips mono"><li>Next.js</li><li>TypeScript</li><li>Supabase</li><li>Cloudflare Workers</li><li>Tailwind CSS</li><li>Vitest</li><li>Playwright</li></ul>
+          <p class="mono part"><i></i>On the board: DSP1, the order screen</p>
+          <a href="https://dapurkayumak.my/" target="_blank" rel="noopener" class="btn">Visit store ↗</a>
+        </article>
+      </div></div>
+    </section>
+
     <section class="sec work" data-state="xtal">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 02 / 04</span><span>Team project</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 03 / 04</span><span>Team project</span></p>
           <figure class="card-fig missing"><img src="assets/work/rotee/cover.jpg" alt="ROTEE bakery inventory apps" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/rotee/cover.jpg</figcaption></figure>
           <h3 class="disp">ROTEE</h3>
           <p class="card-award mono">Gold Award · RISE 2026</p>
@@ -131,7 +146,7 @@
     <section class="sec work" data-state="nfc">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 03 / 04</span><span>Mobile + IoT</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 04 / 04</span><span>Mobile + IoT</span></p>
           <figure class="card-fig missing"><img src="assets/work/taska/cover.jpg" alt="NFC attendance reader and parent app" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/taska/cover.jpg</figcaption></figure>
           <h3 class="disp">Taska Attendance</h3>
           <p class="card-award mono">Gold Award · DINS 2025</p>
@@ -142,26 +157,35 @@
       </div></div>
     </section>
 
-    <section class="sec work" data-state="oled">
-      <div class="sticky"><div class="wrap">
-        <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 04 / 04</span><span>Full-stack web</span></p>
-          <figure class="card-fig missing"><img src="assets/work/halfday-cafe/cover.jpg" alt="Halfday Cafe point-of-sale screens" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/halfday-cafe/cover.jpg</figcaption></figure>
-          <h3 class="disp">Halfday Cafe</h3>
-          <p class="card-award mono">Point of sale + table service</p>
-          <p>A web-based point-of-sale system for a café. Customers, staff and administrators each have their own secure login, the kitchen works from a live order queue, and the owner manages the menu and reviews sales analytics.</p>
-          <ul class="chips mono"><li>PHP</li><li>MySQL</li><li>JavaScript</li><li>HTML/CSS</li></ul>
-          <p class="mono part"><i></i>On the board: DSP1, the order screen</p>
-        </article>
-      </div></div>
-    </section>
 
     <!-- §04 LOGBOOK + SKILLS -->
     <section class="sec record" id="record" data-state="record">
       <div class="wrap">
         <div class="sheet">
           <div class="sheet-head">
-            <div><p class="mono sec-k"><b>§04</b>Record</p><h2 class="disp">Logbook</h2></div>
+            <div><p class="mono sec-k"><b>§04</b>Archive</p><h2 class="disp">More things I’ve built</h2></div>
+            <span class="mono muted">Smaller builds, hobbies and works in progress</span>
+          </div>
+          <ol class="archive">
+            <li>
+              <span class="mono">2026</span>
+              <div><strong>Liquipedia Draft Detector</strong><p>An AI tool that reads a screenshot of an MPL or other league draft screen, detects every hero ban and pick with an object-detection model trained on Roboflow, and outputs ready-to-paste Liquipedia wiki syntax. It turns minutes of manual entry into seconds.</p><ul class="chips mono"><li>Computer vision</li><li>Roboflow</li><li>Object detection</li></ul></div>
+              <span class="mono tag">In progress</span>
+            </li>
+            <li>
+              <span class="mono">2026</span>
+              <div><strong>Halfday Cafe</strong><p>A point-of-sale and table service platform for a café, with separate logins for customers, staff and admins, a kitchen order queue and sales analytics.</p><ul class="chips mono"><li>PHP</li><li>MySQL</li><li>JavaScript</li></ul></div>
+              <a class="mono tag tag-link" href="https://github.com/KhairulIkmal/halfday-cafe" target="_blank" rel="noopener">GitHub ↗</a>
+            </li>
+            <li>
+              <span class="mono">2025</span>
+              <div><strong>eLibrary</strong><p>A personal anime and manga tracker with friends, chat and reading stats, installable as an app. Built as a hobby to sharpen my coding.</p><ul class="chips mono"><li>JavaScript</li><li>Firebase</li><li>PWA</li></ul></div>
+              <span class="mono tag">Hobby</span>
+            </li>
+          </ol>
+
+          <div class="sheet-head sheet-head--sub">
+            <div><p class="mono sec-k"><b>§05</b>Record</p><h2 class="disp">Logbook</h2></div>
             <span class="mono muted">Newest first</span>
           </div>
           <ol class="log">
@@ -176,22 +200,23 @@
           </ol>
 
           <div class="sheet-head sheet-head--sub">
-            <div><p class="mono sec-k"><b>§05</b>Specifications</p><h2 class="disp">Every skill points to where I used it</h2></div>
+            <div><p class="mono sec-k"><b>§06</b>Specifications</p><h2 class="disp">Every skill points to where I used it</h2></div>
           </div>
           <div class="specs">
             <div class="specs-main">
               <table class="tbl">
                 <thead><tr><th class="mono">Skill</th><th class="mono">Where I used it</th></tr></thead>
                 <tbody>
-                  <tr><td>Next.js, React, TypeScript</td><td>Lam Soon</td></tr>
-                  <tr><td>Supabase, PostgreSQL (row-level security)</td><td>Lam Soon</td></tr>
+                  <tr><td>Next.js, React, TypeScript</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
+                  <tr><td>Supabase, PostgreSQL (row-level security)</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
                   <tr><td>SSO, RBAC, MFA</td><td>Lam Soon application portal</td></tr>
-                  <tr><td>Cloudflare Workers</td><td>Lam Soon</td></tr>
-                  <tr><td>Vitest, Playwright, pgTAP</td><td>Lam Soon</td></tr>
+                  <tr><td>Cloudflare Workers</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
+                  <tr><td>Vitest, Playwright, pgTAP</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
                   <tr><td>Flutter, Dart</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
                   <tr><td>Firebase, Firestore</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
                   <tr><td>ESP32, ESP32-CAM</td><td>AgroEzuran, Taska Attendance</td></tr>
                   <tr><td>TensorFlow Lite</td><td>AgroEzuran</td></tr>
+                  <tr><td>Computer vision (Roboflow)</td><td>Liquipedia Draft Detector</td></tr>
                   <tr><td>PHP, MySQL</td><td>Halfday Cafe</td></tr>
                   <tr><td>JavaFX</td><td>Taska Attendance</td></tr>
                   <tr><td class="muted">Also experienced with</td><td>Java, Python, C++, Microsoft SQL Server, Node.js, Docker, Git, OpenAI API, Tailwind CSS</td></tr>
@@ -222,7 +247,7 @@
     <!-- CONTACT -->
     <section class="sec contact" id="contact" data-state="contact">
       <div class="wrap">
-        <p class="mono sec-k"><b>§06</b>Plug in</p>
+        <p class="mono sec-k"><b>§07</b>Plug in</p>
         <h2 class="disp">Hiring a Junior Software Engineer in 2027? Let’s talk.</h2>
         <a class="mail" href="mailto:ikmal03411@gmail.com">ikmal03411@gmail.com</a>
         <p class="mono contact-meta">Based in Batu Pahat, Johor · Willing to relocate</p>

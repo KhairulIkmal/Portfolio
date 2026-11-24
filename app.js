@@ -218,29 +218,29 @@ function oledCanvas() {
   return cv;
 }
 const ORDERS = [
-  ['2× ICED LATTE', '1× BUTTER CROISSANT', 'TABLE 04'],
-  ['1× MATCHA', '1× CHICKEN WRAP', 'TABLE 09'],
-  ['3× AMERICANO', '1× BROWNIE', 'TABLE 02'],
+  ['2× KEREPEK PISANG', '1× REMPEYEK', 'RM 38.00'],
+  ['1× GIFT PACK RAYA', '2× REMPEYEK', 'RM 64.00'],
+  ['5× KEREPEK PISANG', '3× REMPEYEK', 'RM 112.00'],
 ];
 function drawOLED(cv, n, phase) {
   const g = cv.getContext('2d');
   g.fillStyle = '#020403'; g.fillRect(0, 0, cv.width, cv.height);
   g.fillStyle = '#f3e7cf';
   g.font = '600 26px "IBM Plex Mono", monospace';
-  g.fillText('HALFDAY CAFE', 24, 44);
+  g.fillText('DAPUR KAYU MAK', 24, 44);
   g.fillText(`#${String(41 + n).padStart(3, '0')}`, 400, 44);
   g.fillRect(24, 58, 464, 2);
   g.font = '500 30px "IBM Plex Mono", monospace';
   const o = ORDERS[n % ORDERS.length];
   g.fillText(o[0], 24, 112); g.fillText(o[1], 24, 152);
   g.font = '500 22px "IBM Plex Mono", monospace';
-  g.fillStyle = '#9c9482'; g.fillText(o[2], 24, 196);
+  g.fillStyle = '#9c9482'; g.fillText(`${o[2]} · DUITNOW QR`, 24, 196);
   // progress bar
   g.strokeStyle = '#f3e7cf'; g.lineWidth = 2; g.strokeRect(24, 228, 464, 30);
   g.fillStyle = phase >= 1 ? '#ff5a1f' : '#f3e7cf';
   g.fillRect(28, 232, 456 * Math.min(1, phase), 22);
   g.fillStyle = '#020403'; g.font = '600 18px "IBM Plex Mono", monospace';
-  if (phase >= 1) g.fillText('READY', 36, 250);
+  if (phase >= 1) g.fillText('DIBAYAR', 36, 250);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -683,7 +683,7 @@ async function start() {
     ledMat.emissiveIntensity = on ? 4 : 0.5;
     ledLight.intensity = on ? 1.2 : 0.1;
 
-    // OLED: an order fills, flashes READY, next order
+    // OLED: a Dapur Kayu Mak order is paid by DuitNow QR, shows DIBAYAR, next order
     oledT += dt;
     const phase = oledT / 2.4;
     if (phase > 1.5) { oledT = 0; oledN++; }
