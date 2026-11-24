@@ -85,14 +85,27 @@
           <p class="mono card-no"><span><b class="sig">§02</b> · Experience</span><span>Aug 2026 – Jan 2027</span></p>
           <h3 class="disp">Lam Soon Edible Oils</h3>
           <p class="card-role">Software Engineer Intern · Pasir Gudang, Johor</p>
-          <p>I develop the systems that support Lam Soon’s business operations, from administration and logistics through to manufacturing. I have contributed to seven systems so far, four of which are live and used daily, working across the full development lifecycle from requirements to deployment.</p>
-          <ul class="xp-list">
-            <li><b>Secure access.</b> Architected a central application portal with Single Sign-On across subdomains, role-based access control, multi-factor authentication for administrators and PostgreSQL row-level security.</li>
-            <li><b>Logistics.</b> Built an offline-capable pallet tally application for the warehouse, and contributed to a FEFO inventory system currently in development.</li>
-            <li><b>Manufacturing.</b> Developed an A3 problem-solving system, and contributed to an OEE monitoring system currently in development.</li>
-            <li><b>Administration.</b> Delivered room booking and employee feedback systems with booking conflict prevention, AI-assisted Excel import and operational dashboards, including a migration from Firebase to Supabase PostgreSQL.</li>
-            <li><b>Reliability.</b> Implemented asynchronous email notifications with automatic retries, backed by unit, end-to-end and database tests using Vitest, Playwright and pgTAP.</li>
-          </ul>
+          <p class="hook">I build the systems that support Lam Soon’s business, from administration and logistics to manufacturing.</p>
+          <dl class="stats">
+            <div><dt class="mono">Systems built</dt><dd data-count="7">7</dd></div>
+            <div><dt class="mono">Live in daily use</dt><dd data-count="4">4</dd></div>
+            <div><dt class="mono">Business areas</dt><dd data-count="3">3</dd></div>
+            <div><dt class="mono">Test layers</dt><dd data-count="3">3</dd></div>
+          </dl>
+          <div class="tabs" data-tabs>
+            <div class="tab-row mono" role="tablist" aria-label="What I built at Lam Soon">
+              <button type="button" role="tab" id="tb-1" aria-controls="tp-1" aria-selected="true">Secure access</button>
+              <button type="button" role="tab" id="tb-2" aria-controls="tp-2" aria-selected="false" tabindex="-1">Logistics</button>
+              <button type="button" role="tab" id="tb-3" aria-controls="tp-3" aria-selected="false" tabindex="-1">Manufacturing</button>
+              <button type="button" role="tab" id="tb-4" aria-controls="tp-4" aria-selected="false" tabindex="-1">Administration</button>
+              <button type="button" role="tab" id="tb-5" aria-controls="tp-5" aria-selected="false" tabindex="-1">Reliability</button>
+            </div>
+            <p role="tabpanel" id="tp-1" aria-labelledby="tb-1">A central application portal with Single Sign-On across subdomains, role-based access control, multi-factor authentication for administrators and PostgreSQL row-level security.</p>
+            <p role="tabpanel" id="tp-2" aria-labelledby="tb-2" hidden>An offline-capable pallet tally application for the warehouse, plus a FEFO inventory system currently in development.</p>
+            <p role="tabpanel" id="tp-3" aria-labelledby="tb-3" hidden>An A3 problem-solving system, plus an OEE monitoring system currently in development.</p>
+            <p role="tabpanel" id="tp-4" aria-labelledby="tb-4" hidden>Room booking and employee feedback systems with booking conflict prevention, AI-assisted Excel import and operational dashboards, including a migration from Firebase to Supabase PostgreSQL.</p>
+            <p role="tabpanel" id="tp-5" aria-labelledby="tb-5" hidden>Asynchronous email notifications with automatic retries, backed by unit, end-to-end and database tests using Vitest, Playwright and pgTAP.</p>
+          </div>
           <ul class="chips mono"><li>Next.js</li><li>React</li><li>TypeScript</li><li>Supabase</li><li>PostgreSQL</li><li>Cloudflare Workers</li><li>Vitest</li><li>Playwright</li></ul>
           <p class="mono part"><i></i>On the board: U1, the main processor</p>
         </article>
@@ -103,12 +116,18 @@
     <section class="sec work" id="work" data-state="probe">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 01 / 04</span><span>Final Year Project</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 01 / 05</span><span>Final Year Project</span></p>
           <figure class="card-fig missing"><img src="assets/work/agroezuran/cover.jpg" alt="AgroEzuran sensor node and app" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/agroezuran/cover.jpg</figcaption></figure>
           <h3 class="disp">AgroEzuran</h3>
           <p class="card-award mono">Top 20 Finalist · UPM PutraHack 2026</p>
-          <p>A smart farm system that monitors itself and waters itself. ESP32 sensors stream live soil data to mobile and web apps, irrigation switches on automatically using crop-specific moisture thresholds and the rain forecast, and an ESP32-CAM detects plant disease with a MobileNetV2 model running on the device through TensorFlow Lite.</p>
+          <p class="hook">A smart farm that waters itself and spots plant disease.</p>
+          <dl class="facts">
+            <div><dt class="mono">ESP32 soil sensors</dt><dd>Live</dd></div>
+            <div><dt class="mono">auto irrigation</dt><dd>Rain-aware</dd></div>
+            <div><dt class="mono">disease detection</dt><dd>On-device</dd></div>
+          </dl>
           <ul class="chips mono"><li>Flutter</li><li>Firebase</li><li>ESP32 / ESP32-CAM</li><li>TensorFlow Lite</li><li>REST APIs</li></ul>
+          <details class="more"><summary class="mono">Details</summary><p>ESP32 sensors stream live soil data to mobile and web apps, irrigation switches on automatically using crop-specific moisture thresholds and the rain forecast, and an ESP32-CAM detects plant disease with a MobileNetV2 model running on the device through TensorFlow Lite.</p></details>
           <p class="mono part"><i></i>On the board: P1, the soil probe and camera</p>
         </article>
       </div></div>
@@ -117,12 +136,18 @@
     <section class="sec work" data-state="oled">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 02 / 04</span><span>Family business</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 02 / 05</span><span>Family business</span></p>
           <figure class="card-fig missing"><img src="assets/work/dapur-kayu-mak/cover.jpg" alt="Dapur Kayu Mak online store" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/dapur-kayu-mak/cover.jpg</figcaption></figure>
           <h3 class="disp">Dapur Kayu Mak</h3>
           <p class="card-award mono">Live · Online store + back office</p>
-          <p>An online store and back office for my family’s small snack business, selling kerepek pisang, rempeyek, gift packs and kenduri orders. Customers shop in Bahasa Melayu and pay by DuitNow QR, while the back office runs orders, payment reconciliation, inventory, raw materials, recipe costing and production, with an audit log on every change.</p>
+          <p class="hook">My family’s snack shop, online, from checkout to kitchen.</p>
+          <dl class="facts">
+            <div><dt class="mono">checkout</dt><dd>DuitNow QR</dd></div>
+            <div><dt class="mono">to production costing</dt><dd>Recipe</dd></div>
+            <div><dt class="mono">on every change</dt><dd>Audit log</dd></div>
+          </dl>
           <ul class="chips mono"><li>Next.js</li><li>TypeScript</li><li>Supabase</li><li>Cloudflare Workers</li><li>Tailwind CSS</li><li>Vitest</li><li>Playwright</li></ul>
+          <details class="more"><summary class="mono">Details</summary><p>An online store and back office for my family’s small snack business, selling kerepek pisang, rempeyek, gift packs and kenduri orders. Customers shop in Bahasa Melayu and pay by DuitNow QR, while the back office runs orders, payment reconciliation, inventory, raw materials, recipe costing and production, with an audit log on every change.</p></details>
           <p class="mono part"><i></i>On the board: DSP1, the order screen</p>
           <a href="https://dapurkayumak.my/" target="_blank" rel="noopener" class="btn">Visit store ↗</a>
         </article>
@@ -132,12 +157,18 @@
     <section class="sec work" data-state="xtal">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 03 / 04</span><span>Team project</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 03 / 05</span><span>Team project</span></p>
           <figure class="card-fig missing"><img src="assets/work/rotee/cover.jpg" alt="ROTEE bakery inventory apps" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/rotee/cover.jpg</figcaption></figure>
           <h3 class="disp">ROTEE</h3>
           <p class="card-award mono">Gold Award · RISE 2026</p>
-          <p>An inventory platform that helps a bakery waste less. Connected admin, staff and customer apps stay in sync in real time, stock is released first-expired-first-out with batch tracking and expiry alerts, and food nearing expiry is routed to clearance sales or donation.</p>
+          <p class="hook">Bakery inventory that sells the oldest stock first and rescues the rest.</p>
+          <dl class="facts">
+            <div><dt class="mono">admin, staff, customer</dt><dd>3 apps</dd></div>
+            <div><dt class="mono">first-expired-first-out</dt><dd>FEFO</dd></div>
+            <div><dt class="mono">clearance or donation</dt><dd>Rescue</dd></div>
+          </dl>
           <ul class="chips mono"><li>React</li><li>Flutter</li><li>Firestore</li><li>Cloud Functions</li></ul>
+          <details class="more"><summary class="mono">Details</summary><p>An inventory platform that helps a bakery waste less. Connected admin, staff and customer apps stay in sync in real time, stock is released first-expired-first-out with batch tracking and expiry alerts, and food nearing expiry is routed to clearance sales or donation.</p></details>
           <p class="mono part"><i></i>On the board: X1, the crystal that keeps time</p>
         </article>
       </div></div>
@@ -146,99 +177,143 @@
     <section class="sec work" data-state="nfc">
       <div class="sticky"><div class="wrap">
         <article class="card">
-          <p class="mono card-no"><span><b class="sig">§03</b> · Project 04 / 04</span><span>Mobile + IoT</span></p>
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 04 / 05</span><span>Mobile + IoT</span></p>
           <figure class="card-fig missing"><img src="assets/work/taska/cover.jpg" alt="NFC attendance reader and parent app" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/taska/cover.jpg</figcaption></figure>
           <h3 class="disp">Taska Attendance</h3>
           <p class="card-award mono">Gold Award · DINS 2025</p>
-          <p>Tap-in, tap-out attendance for a childcare centre. Each child is checked in with an NFC tap, parents receive an instant notification on their phone, and staff get attendance reports and automated fee summaries across the mobile and desktop apps.</p>
+          <p class="hook">One NFC tap checks a child in, and the parent knows instantly.</p>
+          <dl class="facts">
+            <div><dt class="mono">NFC check-in</dt><dd>1 tap</dd></div>
+            <div><dt class="mono">parent notification</dt><dd>Instant</dd></div>
+            <div><dt class="mono">fee summaries</dt><dd>Auto</dd></div>
+          </dl>
           <ul class="chips mono"><li>Flutter</li><li>JavaFX</li><li>Firebase</li><li>Cloud Messaging</li><li>NFC</li><li>ESP32</li></ul>
+          <details class="more"><summary class="mono">Details</summary><p>Tap-in, tap-out attendance for a childcare centre. Each child is checked in with an NFC tap, parents receive an instant notification on their phone, and staff get attendance reports and automated fee summaries across the mobile and desktop apps.</p></details>
           <p class="mono part"><i></i>On the board: NFC1, the gold coil</p>
         </article>
       </div></div>
     </section>
 
+    <section class="sec work" data-state="printer">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 05 / 05</span><span>Full-stack web</span></p>
+          <figure class="card-fig missing"><img src="assets/work/halfday-cafe/cover.jpg" alt="Halfday Cafe point-of-sale screens" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/halfday-cafe/cover.jpg</figcaption></figure>
+          <h3 class="disp">Halfday Cafe</h3>
+          <p class="card-award mono">Point of sale + table service</p>
+          <p class="hook">Order from the table, cook from a live queue.</p>
+          <dl class="facts">
+            <div><dt class="mono">customer, staff, admin</dt><dd>3 roles</dd></div>
+            <div><dt class="mono">kitchen order queue</dt><dd>Live</dd></div>
+            <div><dt class="mono">analytics for the owner</dt><dd>Sales</dd></div>
+          </dl>
+          <ul class="chips mono"><li>PHP</li><li>MySQL</li><li>JavaScript</li><li>HTML/CSS</li></ul>
+          <details class="more"><summary class="mono">Details</summary><p>A web-based point-of-sale system for a café. Customers, staff and administrators each have their own secure login, the kitchen works from a live order queue, and the owner manages the menu and reviews sales analytics.</p></details>
+          <p class="mono part"><i></i>On the board: PRN1, the receipt printer</p>
+          <a href="https://github.com/KhairulIkmal/halfday-cafe" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
+        </article>
+      </div></div>
+    </section>
 
-    <!-- §04 LOGBOOK + SKILLS -->
+    <!-- §04–§06 ARCHIVE, LOGBOOK, SKILLS -->
     <section class="sec record" id="record" data-state="record">
       <div class="wrap">
         <div class="sheet">
           <div class="sheet-head">
             <div><p class="mono sec-k"><b>§04</b>Archive</p><h2 class="disp">More things I’ve built</h2></div>
-            <span class="mono muted">Smaller builds, hobbies and works in progress</span>
+            <span class="mono muted">Hover or tap a chip</span>
           </div>
-          <ol class="archive">
-            <li>
-              <span class="mono">2026</span>
-              <div><strong>Liquipedia Draft Detector</strong><p>An AI tool that reads a screenshot of an MPL or other league draft screen, detects every hero ban and pick with an object-detection model trained on Roboflow, and outputs ready-to-paste Liquipedia wiki syntax. It turns minutes of manual entry into seconds.</p><ul class="chips mono"><li>Computer vision</li><li>Roboflow</li><li>Object detection</li></ul></div>
-              <span class="mono tag">In progress</span>
-            </li>
-            <li>
-              <span class="mono">2026</span>
-              <div><strong>Halfday Cafe</strong><p>A point-of-sale and table service platform for a café, with separate logins for customers, staff and admins, a kitchen order queue and sales analytics.</p><ul class="chips mono"><li>PHP</li><li>MySQL</li><li>JavaScript</li></ul></div>
-              <a class="mono tag tag-link" href="https://github.com/KhairulIkmal/halfday-cafe" target="_blank" rel="noopener">GitHub ↗</a>
-            </li>
-            <li>
-              <span class="mono">2025</span>
-              <div><strong>eLibrary</strong><p>A personal anime and manga tracker with friends, chat and reading stats, installable as an app. Built as a hobby to sharpen my coding.</p><ul class="chips mono"><li>JavaScript</li><li>Firebase</li><li>PWA</li></ul></div>
-              <span class="mono tag">Hobby</span>
-            </li>
-          </ol>
+          <div class="ics">
+            <button type="button" class="ic" aria-expanded="false">
+              <span class="ic-body">
+                <span class="mono ic-code">KI-DD1</span>
+                <strong>Liquipedia Draft Detector</strong>
+                <span class="mono ic-meta">2026 · In progress</span>
+              </span>
+              <span class="ic-desc">An AI tool that reads a screenshot of an MPL or other league draft screen, detects every hero ban and pick with an object-detection model trained on Roboflow, and outputs ready-to-paste Liquipedia wiki syntax. It turns minutes of manual entry into seconds.<span class="chips mono"><span>Computer vision</span><span>Roboflow</span><span>Object detection</span></span></span>
+            </button>
+            <button type="button" class="ic" aria-expanded="false">
+              <span class="ic-body">
+                <span class="mono ic-code">KI-EL2</span>
+                <strong>eLibrary</strong>
+                <span class="mono ic-meta">2025 · Hobby</span>
+              </span>
+              <span class="ic-desc">A personal anime and manga tracker with friends, chat and reading stats, installable as an app. Built as a hobby to sharpen my coding.<span class="chips mono"><span>JavaScript</span><span>Firebase</span><span>PWA</span></span></span>
+            </button>
+            <div class="ic ic-empty" aria-hidden="true">
+              <span class="ic-body">
+                <span class="mono ic-code">SOCKET 03</span>
+                <strong>Next build</strong>
+                <span class="mono ic-meta">On the bench</span>
+              </span>
+            </div>
+          </div>
 
           <div class="sheet-head sheet-head--sub">
             <div><p class="mono sec-k"><b>§05</b>Record</p><h2 class="disp">Logbook</h2></div>
-            <span class="mono muted">Newest first</span>
+            <span class="mono muted">Scroll to scan · Gold awards spike highest</span>
           </div>
-          <ol class="log">
-            <li><span class="mono">2026</span><span><strong>Software Engineer Intern, Lam Soon Edible Oils.</strong> Developing business systems across administration, logistics and manufacturing.</span><span class="mono tag">Experience</span></li>
-            <li><span class="mono">2026</span><span><strong>Gold Award, International Research and Innovation Symposium (RISE 2026)</strong> for ROTEE.</span><span class="mono tag hot">Gold</span></li>
-            <li><span class="mono">2026</span><span><strong>Top 20 Finalist, UPM PutraHack 2026</strong> with AgroEzuran.</span><span class="mono tag">Hackathon</span></li>
-            <li><span class="mono">2026</span><span><strong>Facilitator and Treasurer, TechUp: Your First Step into IoT</strong> at UTHM. Guided 30+ participants.</span><span class="mono tag">Leadership</span></li>
-            <li><span class="mono">2025</span><span><strong>Gold Award, Digital Innovathon Symposium (DINS 2025)</strong> for the NFC-Based Taska Attendance System.</span><span class="mono tag hot">Gold</span></li>
-            <li><span class="mono">2024</span><span><strong>Volunteer Editor, Liquipedia.</strong> Maintaining accurate data for a global esports wiki.</span><span class="mono tag">Community</span></li>
-            <li><span class="mono">2023</span><span><strong>B.CS (Software Engineering) with Honours, UTHM.</strong> CGPA 3.74, graduating 2027.</span><span class="mono tag">Education</span></li>
-            <li><span class="mono">2022</span><span><strong>Foundation in Science (Physical), Kolej Matrikulasi Johor.</strong> CGPA 3.98.</span><span class="mono tag">Education</span></li>
+          <div class="scope" id="scope" aria-hidden="true">
+            <div class="scope-screen">
+              <svg class="scope-svg" id="scopeSvg" viewBox="0 0 1000 220" preserveAspectRatio="none"></svg>
+              <div class="scope-marks" id="scopeMarks"></div>
+            </div>
+            <div class="scope-read" id="scopeRead">
+              <p class="mono scope-year"></p>
+              <p class="scope-title"></p>
+              <p class="scope-detail"></p>
+            </div>
+          </div>
+          <ol class="log" id="logList">
+            <li data-kind="Experience"><span class="mono">2026</span><span><strong>Software Engineer Intern, Lam Soon Edible Oils.</strong> Developing business systems across administration, logistics and manufacturing.</span><span class="mono tag">Experience</span></li>
+            <li data-kind="Gold"><span class="mono">2026</span><span><strong>Gold Award, International Research and Innovation Symposium (RISE 2026)</strong> for ROTEE.</span><span class="mono tag hot">Gold</span></li>
+            <li data-kind="Hackathon"><span class="mono">2026</span><span><strong>Top 20 Finalist, UPM PutraHack 2026</strong> with AgroEzuran.</span><span class="mono tag">Hackathon</span></li>
+            <li data-kind="Leadership"><span class="mono">2026</span><span><strong>Facilitator and Treasurer, TechUp: Your First Step into IoT</strong> at UTHM. Guided 30+ participants.</span><span class="mono tag">Leadership</span></li>
+            <li data-kind="Gold"><span class="mono">2025</span><span><strong>Gold Award, Digital Innovathon Symposium (DINS 2025)</strong> for the NFC-Based Taska Attendance System.</span><span class="mono tag hot">Gold</span></li>
+            <li data-kind="Community"><span class="mono">2024</span><span><strong>Volunteer Editor, Liquipedia.</strong> Maintaining accurate data for a global esports wiki.</span><span class="mono tag">Community</span></li>
+            <li data-kind="Education"><span class="mono">2023</span><span><strong>B.CS (Software Engineering) with Honours, UTHM.</strong> CGPA 3.74, graduating 2027.</span><span class="mono tag">Education</span></li>
+            <li data-kind="Education"><span class="mono">2022</span><span><strong>Foundation in Science (Physical), Kolej Matrikulasi Johor.</strong> CGPA 3.98.</span><span class="mono tag">Education</span></li>
           </ol>
 
           <div class="sheet-head sheet-head--sub">
-            <div><p class="mono sec-k"><b>§06</b>Specifications</p><h2 class="disp">Every skill points to where I used it</h2></div>
+            <div><p class="mono sec-k"><b>§06</b>Pinout</p><h2 class="disp">Every skill points to where I used it</h2></div>
+            <span class="mono muted">Hover a project or a pin</span>
           </div>
-          <div class="specs">
-            <div class="specs-main">
-              <table class="tbl">
-                <thead><tr><th class="mono">Skill</th><th class="mono">Where I used it</th></tr></thead>
-                <tbody>
-                  <tr><td>Next.js, React, TypeScript</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
-                  <tr><td>Supabase, PostgreSQL (row-level security)</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
-                  <tr><td>SSO, RBAC, MFA</td><td>Lam Soon application portal</td></tr>
-                  <tr><td>Cloudflare Workers</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
-                  <tr><td>Vitest, Playwright, pgTAP</td><td>Lam Soon, Dapur Kayu Mak</td></tr>
-                  <tr><td>Flutter, Dart</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
-                  <tr><td>Firebase, Firestore</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
-                  <tr><td>ESP32, ESP32-CAM</td><td>AgroEzuran, Taska Attendance</td></tr>
-                  <tr><td>TensorFlow Lite</td><td>AgroEzuran</td></tr>
-                  <tr><td>Computer vision (Roboflow)</td><td>Liquipedia Draft Detector</td></tr>
-                  <tr><td>PHP, MySQL</td><td>Halfday Cafe</td></tr>
-                  <tr><td>JavaFX</td><td>Taska Attendance</td></tr>
-                  <tr><td class="muted">Also experienced with</td><td>Java, Python, C++, Microsoft SQL Server, Node.js, Docker, Git, OpenAI API, Tailwind CSS</td></tr>
-                </tbody>
-              </table>
+          <div class="pinout" id="pinout">
+            <div class="pin-projects mono" role="group" aria-label="Highlight skills by project">
+              <button type="button" data-p="lamsoon">Lam Soon</button>
+              <button type="button" data-p="agro">AgroEzuran</button>
+              <button type="button" data-p="dapur">Dapur Kayu Mak</button>
+              <button type="button" data-p="rotee">ROTEE</button>
+              <button type="button" data-p="taska">Taska</button>
+              <button type="button" data-p="halfday">Halfday Cafe</button>
+              <button type="button" data-p="draft">Draft Detector</button>
             </div>
-            <div class="specs-side">
-              <table class="tbl">
-                <thead><tr><th class="mono">Training</th><th class="mono">Provider</th></tr></thead>
-                <tbody>
-                  <tr><td>CCNA: Introduction to Networks</td><td class="mono">Cisco</td></tr>
-                  <tr><td>Machine Learning Using SAS Viya</td><td class="mono">SAS</td></tr>
-                </tbody>
-              </table>
-              <table class="tbl" style="margin-top:32px">
-                <thead><tr><th class="mono">Language</th><th class="mono">Level</th></tr></thead>
-                <tbody>
-                  <tr><td>Malay</td><td class="mono">Native</td></tr>
-                  <tr><td>English</td><td class="mono">Proficient</td></tr>
-                </tbody>
-              </table>
+            <div class="pin-board">
+              <ul class="pins pins-l">
+                <li data-p="lamsoon dapur rotee"><span class="pin-n mono">01</span><span class="pin-name">Next.js, React, TypeScript</span></li>
+                <li data-p="lamsoon dapur"><span class="pin-n mono">02</span><span class="pin-name">Supabase, PostgreSQL (RLS)</span></li>
+                <li data-p="lamsoon"><span class="pin-n mono">03</span><span class="pin-name">SSO, RBAC, MFA</span></li>
+                <li data-p="lamsoon dapur"><span class="pin-n mono">04</span><span class="pin-name">Cloudflare Workers</span></li>
+                <li data-p="lamsoon dapur"><span class="pin-n mono">05</span><span class="pin-name">Vitest, Playwright, pgTAP</span></li>
+                <li data-p="halfday"><span class="pin-n mono">06</span><span class="pin-name">PHP, MySQL</span></li>
+              </ul>
+              <div class="pin-chip" aria-hidden="true">
+                <span class="mono">KI-01</span>
+                <strong>Skills</strong>
+                <span class="mono">12-pin · Rev 2026</span>
+              </div>
+              <ul class="pins pins-r">
+                <li data-p="agro rotee taska"><span class="pin-n mono">07</span><span class="pin-name">Flutter, Dart</span></li>
+                <li data-p="agro rotee taska"><span class="pin-n mono">08</span><span class="pin-name">Firebase, Firestore</span></li>
+                <li data-p="agro taska"><span class="pin-n mono">09</span><span class="pin-name">ESP32, ESP32-CAM</span></li>
+                <li data-p="agro"><span class="pin-n mono">10</span><span class="pin-name">TensorFlow Lite</span></li>
+                <li data-p="draft"><span class="pin-n mono">11</span><span class="pin-name">Computer vision (Roboflow)</span></li>
+                <li data-p="taska"><span class="pin-n mono">12</span><span class="pin-name">JavaFX</span></li>
+              </ul>
             </div>
+            <p class="pin-also"><span class="mono">Also experienced with</span> Java · Python · C++ · Microsoft SQL Server · Node.js · Docker · Git · OpenAI API · Tailwind CSS</p>
+            <p class="pin-also"><span class="mono">Training</span> CCNA: Introduction to Networks (Cisco) · Machine Learning Using SAS Viya (SAS) <span class="mono pin-gap">Languages</span> Malay (native) · English (proficient)</p>
           </div>
         </div>
       </div>

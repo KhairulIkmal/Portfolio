@@ -165,6 +165,7 @@ function boardTexture() {
   g.fillText('NFC1', px(0.88), pz(-1.78));
   g.fillText('DSP1', px(0.95), pz(1.72));
   g.fillText('P1', px(3.0), pz(-0.25));
+  g.fillText('PRN1', px(2.05), pz(-1.92));
   g.fillText('D1', px(-0.2), pz(-1.6));
   g.fillText('J1', px(-0.7), pz(1.7));
   g.fillText('SW1', px(-3.25), pz(-1.0));
@@ -222,6 +223,30 @@ const ORDERS = [
   ['1× GIFT PACK RAYA', '2× REMPEYEK', 'RM 64.00'],
   ['5× KEREPEK PISANG', '3× REMPEYEK', 'RM 112.00'],
 ];
+function receiptCanvas() {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 398;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#f2eee4'; g.fillRect(0, 0, 256, 398);
+  g.fillStyle = '#1b1b1b'; g.textAlign = 'center';
+  g.font = '700 22px "IBM Plex Mono", monospace'; g.fillText('HALFDAY CAFE', 128, 40);
+  g.font = '500 14px "IBM Plex Mono", monospace'; g.fillText('TABLE 04 · ORDER #118', 128, 64);
+  g.textAlign = 'left';
+  const dash = (y) => { g.fillText('- - - - - - - - - - - - - -', 18, y); };
+  dash(88);
+  g.font = '500 15px "IBM Plex Mono", monospace';
+  [['2x ICED LATTE', '18.00'], ['1x CROISSANT', '7.50'], ['1x NASI LEMAK', '9.90']].forEach(([a, b], i) => {
+    g.fillText(a, 18, 118 + i * 28); g.textAlign = 'right'; g.fillText(b, 238, 118 + i * 28); g.textAlign = 'left';
+  });
+  g.font = '500 14px "IBM Plex Mono", monospace'; dash(200);
+  g.font = '700 18px "IBM Plex Mono", monospace'; g.fillText('TOTAL', 18, 232); g.textAlign = 'right'; g.fillText('RM 35.40', 238, 232);
+  g.textAlign = 'center'; g.font = '500 14px "IBM Plex Mono", monospace';
+  g.fillText('SENT TO KITCHEN QUEUE', 128, 282);
+  g.fillStyle = '#ff5a1f'; g.fillRect(70, 300, 116, 4);
+  g.fillStyle = '#1b1b1b'; g.fillText('THANK YOU', 128, 340);
+  for (let x = 30; x < 226; x += 5) g.fillRect(x, 356, (x * 7) % 3 + 1, 24);
+  return cv;
+}
+
 function drawOLED(cv, n, phase) {
   const g = cv.getContext('2d');
   g.fillStyle = '#020403'; g.fillRect(0, 0, cv.width, cv.height);
@@ -504,6 +529,23 @@ async function start() {
   anchor('probe', probe, 5.6, 0.2, -0.3);
   addPart(probe, 0.2, { delay: 0.2, slide: new THREE.Vector3(1.1, 0, 0) });
 
+  /* ── PRN1: receipt printer (Halfday Cafe), on a ribbon cable off the back edge ── */
+  const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.015, 0.78), new THREE.MeshStandardMaterial({ color: 0x4a4740, roughness: 0.7 }));
+  ribbon.position.set(1.7, 0.1, -2.46); board.add(ribbon);
+  const printer = new THREE.Group();
+  printer.add(new THREE.Mesh(new RoundedBoxGeometry(1.4, 0.5, 0.9, 4, 0.08), new THREE.MeshStandardMaterial({ color: 0x1d1e1c, roughness: 0.55, metalness: 0.1 })));
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.02, 0.07), M.die); slot.position.set(0, 0.255, -0.2); printer.add(slot);
+  const prLedMat = new THREE.MeshStandardMaterial({ color: COL.signal, emissive: COL.signal, emissiveIntensity: 1 });
+  const prLed = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.03, 0.09), prLedMat); prLed.position.set(0.52, 0.26, 0.28); printer.add(prLed);
+  const rTex = new THREE.CanvasTexture(receiptCanvas()); rTex.colorSpace = THREE.SRGBColorSpace;
+  const paperGeo = new THREE.PlaneGeometry(0.86, 1.34); paperGeo.translate(0, 0.67, 0);
+  const paper = new THREE.Mesh(paperGeo, new THREE.MeshStandardMaterial({ map: rTex, color: 0x9d998f, roughness: 0.95, side: THREE.DoubleSide }));
+  paper.position.set(0, 0.26, -0.2); paper.rotation.x = -0.28; printer.add(paper);
+  printer.position.set(1.7, 0.2, -3.25);
+  anchor('printer', printer, 0, 0.3, 0);
+  addPart(printer, 0.6, { delay: 0.2, slide: new THREE.Vector3(0, 0, -0.5) });
+  let printT = 0;
+
 
   /* ── post-processing ─────────────────────── */
   const composer = new EffectComposer(renderer);
@@ -519,16 +561,17 @@ async function start() {
      ════════════════════════════════════════ */
   let mobile = false;
   const STATE = {
-    // f = focus per part: [NFC1, P1 probe, DSP1 screen, X1 crystal]
-    hero:    { c: [4.0, 9.0, 13.5],  t: [-3.0, -0.2, 0.6],  ry: -0.42, ex: 0,    lb: 0, f: [0.6, 0.6, 0.6, 0.3], spin: 0 },
-    build:   { c: [10.9, 9.0, 9.1],  t: [0.8, 0.4, -1.5],  ry: 0.12,  ex: 1,    lb: 1, f: [0.3, 0.3, 0.3, 0.3], spin: 0 },
-    xp:      { c: [-3.8, 5.4, 5.5],  t: [-3.3, 0.0, 0.65], ry: 0,     ex: 0.3,  lb: 0, f: [1.2, 1.2, 1.2, 0.3], spin: 0 },
-    probe:   { c: [2.4, 6.4, 6.0],   t: [2.9, 0.0, 0.1],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 1.8, 0.2, 0.2], spin: 0 },
-    xtal:    { c: [-5.3, 5.0, 5.6],  t: [-4.8, 0.0, 0.7], ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 0.2, 1.8], spin: 0 },
-    nfc:     { c: [-0.4, 5.2, 4.2],  t: [0.1, 0.0, -0.7],  ry: 0,     ex: 0,    lb: 0, f: [1.8, 0.2, 0.2, 0.2], spin: 0 },
-    oled:    { c: [-0.4, 5.6, 5.6],  t: [0.1, 0.0, 0.7],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 1.8, 0.2], spin: 0 },
-    record:  { c: [0.5, 15, 7],      t: [0.5, 0.0, 0.0],   ry: 0.0,   ex: 0.25, lb: 0, f: [0.5, 0.5, 0.5, 0.5], spin: 0 },
-    contact: { c: [0.0, 6.0, 9.5],   t: [1.0, -0.6, 0.0],  ry: 0,     ex: 0,    lb: 0, f: [1, 1, 1, 0.6],       spin: 1 },
+    // f = focus per part: [NFC1, P1 probe, DSP1 screen, X1 crystal, PRN1 printer]
+    hero:    { c: [4.0, 9.0, 13.5],  t: [-3.0, -0.2, 0.6],  ry: -0.42, ex: 0,    lb: 0, f: [0.6, 0.6, 0.6, 0.3, 0.6], spin: 0 },
+    build:   { c: [10.9, 9.0, 9.1],  t: [0.8, 0.4, -1.5],  ry: 0.12,  ex: 1,    lb: 1, f: [0.3, 0.3, 0.3, 0.3, 0.3], spin: 0 },
+    xp:      { c: [-3.8, 5.4, 5.5],  t: [-3.3, 0.0, 0.65], ry: 0,     ex: 0.3,  lb: 0, f: [1.2, 1.2, 1.2, 0.3, 0.3], spin: 0 },
+    probe:   { c: [2.4, 6.4, 6.0],   t: [2.9, 0.0, 0.1],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 1.8, 0.2, 0.2, 0.2], spin: 0 },
+    xtal:    { c: [-5.3, 5.0, 5.6],  t: [-4.8, 0.0, 0.7], ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 0.2, 1.8, 0.2], spin: 0 },
+    nfc:     { c: [-0.4, 5.2, 4.2],  t: [0.1, 0.0, -0.7],  ry: 0,     ex: 0,    lb: 0, f: [1.8, 0.2, 0.2, 0.2, 0.2], spin: 0 },
+    printer: { c: [0.2, 3.0, 0.2],    t: [0.7, 0.7, -3.1],  ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 0.2, 0.2, 1.8], spin: 0 },
+    oled:    { c: [-0.4, 5.6, 5.6],  t: [0.1, 0.0, 0.7],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 1.8, 0.2, 0.2], spin: 0 },
+    record:  { c: [0.5, 15, 7],      t: [0.5, 0.0, 0.0],   ry: 0.0,   ex: 0.25, lb: 0, f: [0.5, 0.5, 0.5, 0.5, 0.5], spin: 0 },
+    contact: { c: [0.0, 6.0, 9.5],   t: [1.0, -0.6, 0.0],  ry: 0,     ex: 0,    lb: 0, f: [1, 1, 1, 0.6, 1],       spin: 1 },
   };
   const STATE_M = {
     hero:  { c: [1.5, 12.5, 14], t: [0.8, -1.0, -5.6] },
@@ -538,6 +581,7 @@ async function start() {
     xtal:  { c: [-3.0, 5.6, 6.6],  t: [-3.0, 0.0, 1.9] },
     nfc:   { c: [1.72, 7.0, 6.5],  t: [1.72, 0.0, 0.55] },
     oled:  { c: [1.72, 7.0, 8.6],  t: [1.72, 0.0, 2.65] },
+    printer: { c: [1.7, 6.2, 3.4], t: [1.7, 0.0, -1.6] },
     record:  { c: [0.5, 18, 8], t: [0.5, 0, 0] },
     contact: { c: [0.0, 9, 13], t: [1.0, -2.6, -2.0] },
   };
@@ -731,6 +775,14 @@ async function start() {
     // crystal glows when ROTEE is in focus
     xtalMat.emissiveIntensity = Math.max(0, cur.f[3] - 0.4) * (0.5 + 0.35 * Math.sin(t * 3) * motion);
 
+    // receipt printer: prints an order, holds, tears off, repeats
+    printT += dt * (0.6 + Math.min(1, cur.f[4]) * 0.6);
+    if (printT > 5) printT = 0;
+    const pp = REDUCE ? 1 : smooth(printT / 3);
+    paper.scale.y = Math.max(0.001, pp);
+    rTex.repeat.set(1, Math.max(0.001, pp)); rTex.offset.set(0, 1 - pp);
+    prLedMat.emissiveIntensity = (printT < 3 && !REDUCE) ? (Math.floor(t * 6) % 2 ? 3 : 0.4) : 1.2;
+
     // floating readouts
     for (const r of readouts) {
       const vis = smooth((cur.f[r.fi] - 1.0) / 0.6);
@@ -749,6 +801,205 @@ async function start() {
   requestAnimationFrame(frame);
 }
 
+/* ════════════════════════════════════════════════════════════
+   PAGE INTERACTIONS (no WebGL needed)
+   ════════════════════════════════════════════════════════════ */
+function onVisible(el, cb, threshold = 0.35) {
+  if (!el) return;
+  if (!('IntersectionObserver' in window)) { cb(); return; }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { cb(); io.disconnect(); } });
+  }, { threshold });
+  io.observe(el);
+}
+
+// Experience: numbers count up the first time the card is seen.
+function initCounters() {
+  document.querySelectorAll('[data-count]').forEach((el) => {
+    const target = Number(el.dataset.count);
+    if (REDUCE) return;
+    el.textContent = '0';
+    onVisible(el, () => {
+      const t0 = performance.now();
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / 900);
+        el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, 0.6);
+  });
+}
+
+// Experience: accessible tabs (click, arrow keys, Home/End).
+function initTabs() {
+  document.querySelectorAll('[data-tabs]').forEach((box) => {
+    const tabs = [...box.querySelectorAll('[role="tab"]')];
+    const select = (tab, focus) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (focus) tab.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        const k = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (k === undefined) return;
+        e.preventDefault();
+        select(tabs[(k + tabs.length) % tabs.length], true);
+      });
+    });
+  });
+}
+
+// Archive: tap a chip to open it (hover opens it on desktop via CSS).
+function initChips() {
+  const chips = [...document.querySelectorAll('button.ic')];
+  chips.forEach((c) => c.addEventListener('click', () => {
+    const open = c.getAttribute('aria-expanded') !== 'true';
+    chips.forEach((o) => o.setAttribute('aria-expanded', 'false'));
+    c.setAttribute('aria-expanded', String(open));
+  }));
+}
+
+// Logbook: an oscilloscope trace that draws itself as you scroll.
+function initScope() {
+  const list = document.getElementById('logList');
+  const svg = document.getElementById('scopeSvg');
+  const marksEl = document.getElementById('scopeMarks');
+  const read = document.getElementById('scopeRead');
+  if (!list || !svg || !marksEl || !read) return;
+
+  const items = [...list.children].reverse().map((li) => {
+    const strong = li.querySelector('strong').textContent.trim();
+    return {
+      year: li.children[0].textContent.trim(),
+      title: strong.replace(/\.$/, ''),
+      detail: li.children[1].textContent.replace(strong, '').trim(),
+      kind: li.dataset.kind,
+    };
+  });
+  const HEIGHT = { Gold: 165, Experience: 140, Hackathon: 118, Leadership: 96, Education: 78, Community: 68 };
+  const W = 1000, H = 220, BASE = 186;
+  const xs = items.map((_, i) => 70 + i * (860 / (items.length - 1)));
+
+  let d = `M0 ${BASE}`;
+  xs.forEach((x, i) => {
+    const h = HEIGHT[items[i].kind] || 70;
+    const from = i ? xs[i - 1] + 30 : 0;
+    for (let k = from + 10, s = 1; k < x - 30; k += 10, s = -s) d += ` L${k} ${BASE + s * 2.5}`;
+    d += ` L${x - 30} ${BASE} L${x - 12} ${BASE + 9} L${x} ${BASE - h} L${x + 12} ${BASE + 13} L${x + 30} ${BASE}`;
+  });
+  for (let k = xs[xs.length - 1] + 40, s = 1; k < W; k += 10, s = -s) d += ` L${k} ${BASE + s * 2.5}`;
+  d += ` L${W} ${BASE}`;
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const ghost = document.createElementNS(NS, 'path'); ghost.setAttribute('d', d); ghost.setAttribute('class', 'ghost');
+  const trace = document.createElementNS(NS, 'path'); trace.setAttribute('d', d); trace.setAttribute('class', 'trace');
+  svg.append(ghost, trace);
+  const len = trace.getTotalLength();
+  trace.style.strokeDasharray = `${len}`;
+
+  const head = document.createElement('div'); head.className = 'scope-head'; marksEl.appendChild(head);
+  const marks = xs.map((x, i) => {
+    const m = document.createElement('span');
+    m.className = 'scope-mark';
+    m.style.left = `${x / W * 100}%`;
+    m.style.top = `${(BASE - (HEIGHT[items[i].kind] || 70)) / H * 100}%`;
+    m.addEventListener('mouseenter', () => { hover = i; show(i); });
+    m.addEventListener('mouseleave', () => { hover = -1; show(active); });
+    marksEl.appendChild(m);
+    const y = document.createElement('span'); y.className = 'scope-yr'; y.style.left = m.style.left; y.textContent = items[i].year;
+    marksEl.appendChild(y);
+    return m;
+  });
+
+  const [rYear, rTitle, rDetail] = ['.scope-year', '.scope-title', '.scope-detail'].map((s) => read.querySelector(s));
+  let active = -1, hover = -1, shown = -2;
+  function show(i) {
+    if (i === shown) return;
+    shown = i;
+    marks.forEach((m, k) => m.classList.toggle('on', k === i));
+    if (i < 0) { rYear.textContent = 'Signal idle'; rTitle.textContent = 'Scroll to scan'; rDetail.textContent = 'Each spike is a milestone. Gold awards spike highest.'; return; }
+    const it = items[i];
+    rYear.textContent = `${it.year} · ${it.kind}`;
+    rTitle.textContent = it.title;
+    rDetail.textContent = it.detail;
+  }
+
+  document.querySelector('.sheet')?.classList.add('has-scope');
+  const screen = svg.parentElement;
+  function update() {
+    const r = screen.getBoundingClientRect();
+    const p = REDUCE ? 1 : clamp01((innerHeight * 0.9 - r.top) / (innerHeight * 0.55));
+    trace.style.strokeDashoffset = `${len * (1 - p)}`;
+    head.style.left = `${p * 100}%`;
+    head.style.opacity = p > 0 && p < 1 ? '1' : '0';
+    active = -1;
+    xs.forEach((x, i) => { const lit = x / W <= p + 0.001; marks[i].classList.toggle('lit', lit); if (lit) active = i; });
+    if (hover < 0) show(active);
+  }
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+}
+
+// Skills: hover a project to light its pins, or a pin to light its projects.
+function initPinout() {
+  const box = document.getElementById('pinout');
+  if (!box) return;
+  const btns = [...box.querySelectorAll('button[data-p]')];
+  const pins = [...box.querySelectorAll('li[data-p]')];
+  let locked = null, touched = false, demo = null;
+
+  function showProject(p) {
+    box.classList.toggle('active', !!p);
+    pins.forEach((li) => li.classList.toggle('on', !!p && li.dataset.p.split(' ').includes(p)));
+    btns.forEach((b) => b.classList.toggle('on', b.dataset.p === p));
+  }
+  function showSkill(li) {
+    const ps = li.dataset.p.split(' ');
+    box.classList.add('active');
+    pins.forEach((l) => l.classList.toggle('on', l === li));
+    btns.forEach((b) => b.classList.toggle('on', ps.includes(b.dataset.p)));
+  }
+  const stopDemo = () => { touched = true; clearInterval(demo); };
+  btns.forEach((b) => {
+    b.addEventListener('mouseenter', () => { stopDemo(); showProject(b.dataset.p); });
+    b.addEventListener('focus', () => { stopDemo(); showProject(b.dataset.p); });
+    b.addEventListener('mouseleave', () => showProject(locked));
+    b.addEventListener('click', () => { stopDemo(); locked = locked === b.dataset.p ? null : b.dataset.p; showProject(locked); });
+  });
+  pins.forEach((li) => {
+    li.addEventListener('mouseenter', () => { stopDemo(); showSkill(li); });
+    li.addEventListener('mouseleave', () => showProject(locked));
+  });
+
+  // Until someone interacts, cycle through the projects once it scrolls into view.
+  if (!REDUCE) onVisible(box, () => {
+    let i = 0;
+    demo = setInterval(() => {
+      if (touched) return clearInterval(demo);
+      showProject(btns[i % btns.length].dataset.p);
+      i++;
+      if (i > btns.length) { clearInterval(demo); showProject(null); }
+    }, 1400);
+  }, 0.4);
+}
+
+function initUI() {
+  initCounters();
+  initTabs();
+  initChips();
+  initScope();
+  initPinout();
+}
+
+initUI();
 pageBits();
 boot();
 start();
