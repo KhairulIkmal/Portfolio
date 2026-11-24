@@ -3,253 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Khairul Ikmal — Portfolio</title>
-  <meta name="description" content="Khairul Ikmal — Software Engineering student at UTHM. Full-Stack, Mobile & IoT developer. Open to internship August 2026 – January 2027." />
+  <title>Khairul Ikmal — Junior Software Engineer</title>
+  <meta name="description" content="Khairul Ikmal — Software Engineer Intern at Lam Soon Edible Oils and two-time Gold Award winner. Full-stack systems, from the database to the device." />
   <meta name="author" content="Khairul Ikmal" />
-  <meta property="og:title" content="Khairul Ikmal — Portfolio" />
-  <meta property="og:description" content="Full-Stack, Mobile & IoT developer. Software Engineering student at UTHM with CGPA 3.7." />
+  <meta property="og:title" content="Khairul Ikmal — Junior Software Engineer" />
+  <meta property="og:description" content="I build systems that keep a business running. Next.js, TypeScript, Supabase, Flutter, ESP32." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://kaiii-dev.my" />
-  <meta property="og:image" content="https://kaiii-dev.my/og-image.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Khairul Ikmal — Portfolio" />
-  <meta name="twitter:description" content="Full-Stack, Mobile & IoT developer. Software Engineering student at UTHM." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Photo placeholders are only shown while developing locally.
+    if (['localhost', '127.0.0.1'].includes(location.hostname)) document.documentElement.classList.add('draft');
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
 
-  <!-- Scroll Progress Bar -->
-  <div class="scroll-progress" id="scrollProgress"></div>
+  <div class="boot mono" id="boot" aria-hidden="true"><div id="bootLog"></div></div>
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="callouts" id="callouts" aria-hidden="true"></div>
 
-  <!-- Social Sidebar (fixed left) -->
-  <aside class="social-sidebar" aria-label="Social links">
-    <a href="https://github.com/khairulikmal" target="_blank" rel="noopener" class="social-link" aria-label="GitHub">
-      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-    </a>
-    <a href="https://linkedin.com/in/khairul-ikmal-mohmad-215b2a372" target="_blank" rel="noopener" class="social-link" aria-label="LinkedIn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-    </a>
-  </aside>
-
-  <!-- Resume Fixed Button -->
-  <a href="resume.pdf" target="_blank" class="resume-fixed">RESUME ↗</a>
-
-  <!-- Navigation -->
-  <nav class="nav" id="nav">
-    <a href="#hero" class="nav-logo">Khairul Ikmal</a>
-    <a href="mailto:Ikmal03411@gmail.com" class="nav-email">Ikmal03411@gmail.com</a>
-    <ul class="nav-links">
-      <li><a href="#about">ABOUT</a></li>
-      <li><a href="#projects">WORK</a></li>
-      <li><a href="#contact">CONTACT</a></li>
-    </ul>
-    <button class="nav-burger" id="navMenu" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <!-- Mobile Nav Drawer -->
-  <div class="nav-drawer" id="navDrawer">
-    <a href="#about"    class="nav-drawer-link">ABOUT</a>
-    <a href="#projects" class="nav-drawer-link">WORK</a>
-    <a href="#contact"  class="nav-drawer-link">CONTACT</a>
-    <a href="resume.pdf" target="_blank" class="nav-drawer-link">RESUME ↗</a>
-  </div>
+  <header class="bar">
+    <div class="wrap bar-in">
+      <a href="#top" class="bar-id mono"><i></i>Khairul Ikmal</a>
+      <nav class="mono" aria-label="Sections">
+        <a href="#build" class="opt">Parts</a>
+        <a href="#experience" class="opt">Experience</a>
+        <a href="#work">Work</a>
+        <a href="#record" class="opt">Record</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <span class="mono clock" id="clock">Johor --:-- MYT</span>
+      <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-solid btn-sm">Resume ↓</a>
+    </div>
+  </header>
 
   <main>
-
-    <!-- ── Hero ─────────────────────────────────────── -->
-    <section class="hero" id="hero">
-      <div class="hero-ambient" aria-hidden="true">
-        <div class="amb-orb amb-orb--l"></div>
-        <div class="amb-orb amb-orb--r"></div>
-      </div>
-
-      <div class="hero-inner">
-
-        <!-- Left: copy -->
-        <div class="hero-copy">
-          <span class="hero-badge">✦ WELCOME TO MY PORTFOLIO</span>
-          <h1 class="hero-heading">Building <span class="accent">Digital</span><br>Experiences</h1>
-          <p class="hero-sub">I'm <strong>Khairul Ikmal</strong>, a passionate <span class="accent hero-role-cycle" id="heroRole">Full-Stack Developer</span> crafting clean, performant web, mobile &amp; IoT applications.</p>
-          <div class="hero-socials">
-            <a href="https://github.com/khairulikmal" target="_blank" rel="noopener" class="hero-social-btn" aria-label="GitHub">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            </a>
-            <a href="https://linkedin.com/in/khairul-ikmal-mohmad-215b2a372" target="_blank" rel="noopener" class="hero-social-btn" aria-label="LinkedIn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-            </a>
-          </div>
-          <div class="hero-ctas">
-            <a href="mailto:Ikmal03411@gmail.com" class="btn-cta btn-cta--purple">Hire Me →</a>
-            <a href="resume.pdf" target="_blank" class="btn-cta btn-cta--dark">Get Resume ↓</a>
-          </div>
+    <!-- HERO -->
+    <section class="sec hero" id="top" data-state="hero">
+      <div class="wrap hero-in">
+        <p class="mono kicker"><span class="led"></span>Software Engineer · <span class="role" id="heroRole">IoT Developer</span></p>
+        <h1 class="disp hero-name">Khairul<br>Ikmal</h1>
+        <p class="hero-line">I build software that talks to hardware.</p>
+        <p class="hero-sub">IoT developer at heart, full-stack by trade. From ESP32 sensors and NFC readers to the mobile apps, web dashboards and cloud systems behind them. Two-time Gold Award winner.</p>
+        <div class="actions">
+          <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-solid">Resume ↓</a>
+          <a href="mailto:ikmal03411@gmail.com" class="btn">Email</a>
+          <a href="https://github.com/KhairulIkmal" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
         </div>
+      </div>
+      <p class="mono cue">Scroll to take me apart</p>
+    </section>
 
-        <!-- Right: code editor mockup -->
-        <div class="hero-editor" aria-hidden="true">
-          <div class="code-editor">
-            <div class="code-bar">
-              <div class="code-dots">
-                <span class="code-dot code-dot--r"></span>
-                <span class="code-dot code-dot--y"></span>
-                <span class="code-dot code-dot--g"></span>
-              </div>
-              <span class="code-filename">● Portfolio.js</span>
+    <!-- §01 EXPLODED VIEW -->
+    <section class="sec build" id="build" data-state="build">
+      <div class="sticky">
+        <div class="wrap">
+          <p class="mono sec-k"><b>§01</b>Exploded view</p>
+          <h2 class="disp">Every part of this board is on my résumé.</h2>
+        </div>
+      </div>
+      <ul class="build-list" id="buildList"></ul>
+    </section>
+
+    <!-- §02 EXPERIENCE -->
+    <section class="sec work xp" id="experience" data-state="xp">
+      <div class="sticky"><div class="wrap">
+        <article class="card card-wide">
+          <p class="mono card-no"><span><b class="sig">§02</b> · Experience</span><span>Aug 2026 – Jan 2027</span></p>
+          <h3 class="disp">Lam Soon Edible Oils</h3>
+          <p class="card-role">Software Engineer Intern · Pasir Gudang, Johor</p>
+          <p>I develop the systems that support Lam Soon’s business operations, from administration and logistics through to manufacturing. I have contributed to seven systems so far, four of which are live and used daily, working across the full development lifecycle from requirements to deployment.</p>
+          <ul class="xp-list">
+            <li><b>Secure access.</b> Architected a central application portal with Single Sign-On across subdomains, role-based access control, multi-factor authentication for administrators and PostgreSQL row-level security.</li>
+            <li><b>Logistics.</b> Built an offline-capable pallet tally application for the warehouse, and contributed to a FEFO inventory system currently in development.</li>
+            <li><b>Manufacturing.</b> Developed an A3 problem-solving system, and contributed to an OEE monitoring system currently in development.</li>
+            <li><b>Administration.</b> Delivered room booking and employee feedback systems with booking conflict prevention, AI-assisted Excel import and operational dashboards, including a migration from Firebase to Supabase PostgreSQL.</li>
+            <li><b>Reliability.</b> Implemented asynchronous email notifications with automatic retries, backed by unit, end-to-end and database tests using Vitest, Playwright and pgTAP.</li>
+          </ul>
+          <ul class="chips mono"><li>Next.js</li><li>React</li><li>TypeScript</li><li>Supabase</li><li>PostgreSQL</li><li>Cloudflare Workers</li><li>Vitest</li><li>Playwright</li></ul>
+          <p class="mono part"><i></i>On the board: U1, the main processor</p>
+        </article>
+      </div></div>
+    </section>
+
+    <!-- §03 WORK -->
+    <section class="sec work" id="work" data-state="probe">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 01 / 04</span><span>Final Year Project</span></p>
+          <figure class="card-fig missing"><img src="assets/work/agroezuran/cover.jpg" alt="AgroEzuran sensor node and app" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/agroezuran/cover.jpg</figcaption></figure>
+          <h3 class="disp">AgroEzuran</h3>
+          <p class="card-award mono">Top 20 Finalist · UPM PutraHack 2026</p>
+          <p>A smart farm system that monitors itself and waters itself. ESP32 sensors stream live soil data to mobile and web apps, irrigation switches on automatically using crop-specific moisture thresholds and the rain forecast, and an ESP32-CAM detects plant disease with a MobileNetV2 model running on the device through TensorFlow Lite.</p>
+          <ul class="chips mono"><li>Flutter</li><li>Firebase</li><li>ESP32 / ESP32-CAM</li><li>TensorFlow Lite</li><li>REST APIs</li></ul>
+          <p class="mono part"><i></i>On the board: P1, the soil probe and camera</p>
+        </article>
+      </div></div>
+    </section>
+
+    <section class="sec work" data-state="xtal">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 02 / 04</span><span>Team project</span></p>
+          <figure class="card-fig missing"><img src="assets/work/rotee/cover.jpg" alt="ROTEE bakery inventory apps" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/rotee/cover.jpg</figcaption></figure>
+          <h3 class="disp">ROTEE</h3>
+          <p class="card-award mono">Gold Award · RISE 2026</p>
+          <p>An inventory platform that helps a bakery waste less. Connected admin, staff and customer apps stay in sync in real time, stock is released first-expired-first-out with batch tracking and expiry alerts, and food nearing expiry is routed to clearance sales or donation.</p>
+          <ul class="chips mono"><li>React</li><li>Flutter</li><li>Firestore</li><li>Cloud Functions</li></ul>
+          <p class="mono part"><i></i>On the board: X1, the crystal that keeps time</p>
+        </article>
+      </div></div>
+    </section>
+
+    <section class="sec work" data-state="nfc">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 03 / 04</span><span>Mobile + IoT</span></p>
+          <figure class="card-fig missing"><img src="assets/work/taska/cover.jpg" alt="NFC attendance reader and parent app" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/taska/cover.jpg</figcaption></figure>
+          <h3 class="disp">Taska Attendance</h3>
+          <p class="card-award mono">Gold Award · DINS 2025</p>
+          <p>Tap-in, tap-out attendance for a childcare centre. Each child is checked in with an NFC tap, parents receive an instant notification on their phone, and staff get attendance reports and automated fee summaries across the mobile and desktop apps.</p>
+          <ul class="chips mono"><li>Flutter</li><li>JavaFX</li><li>Firebase</li><li>Cloud Messaging</li><li>NFC</li><li>ESP32</li></ul>
+          <p class="mono part"><i></i>On the board: NFC1, the gold coil</p>
+        </article>
+      </div></div>
+    </section>
+
+    <section class="sec work" data-state="oled">
+      <div class="sticky"><div class="wrap">
+        <article class="card">
+          <p class="mono card-no"><span><b class="sig">§03</b> · Project 04 / 04</span><span>Full-stack web</span></p>
+          <figure class="card-fig missing"><img src="assets/work/halfday-cafe/cover.jpg" alt="Halfday Cafe point-of-sale screens" loading="lazy" onload="this.parentNode.classList.remove('missing')" onerror="this.remove()"><figcaption class="mono">Photo: assets/work/halfday-cafe/cover.jpg</figcaption></figure>
+          <h3 class="disp">Halfday Cafe</h3>
+          <p class="card-award mono">Point of sale + table service</p>
+          <p>A web-based point-of-sale system for a café. Customers, staff and administrators each have their own secure login, the kitchen works from a live order queue, and the owner manages the menu and reviews sales analytics.</p>
+          <ul class="chips mono"><li>PHP</li><li>MySQL</li><li>JavaScript</li><li>HTML/CSS</li></ul>
+          <p class="mono part"><i></i>On the board: DSP1, the order screen</p>
+        </article>
+      </div></div>
+    </section>
+
+    <!-- §04 LOGBOOK + SKILLS -->
+    <section class="sec record" id="record" data-state="record">
+      <div class="wrap">
+        <div class="sheet">
+          <div class="sheet-head">
+            <div><p class="mono sec-k"><b>§04</b>Record</p><h2 class="disp">Logbook</h2></div>
+            <span class="mono muted">Newest first</span>
+          </div>
+          <ol class="log">
+            <li><span class="mono">2026</span><span><strong>Software Engineer Intern, Lam Soon Edible Oils.</strong> Developing business systems across administration, logistics and manufacturing.</span><span class="mono tag">Experience</span></li>
+            <li><span class="mono">2026</span><span><strong>Gold Award, International Research and Innovation Symposium (RISE 2026)</strong> for ROTEE.</span><span class="mono tag hot">Gold</span></li>
+            <li><span class="mono">2026</span><span><strong>Top 20 Finalist, UPM PutraHack 2026</strong> with AgroEzuran.</span><span class="mono tag">Hackathon</span></li>
+            <li><span class="mono">2026</span><span><strong>Facilitator and Treasurer, TechUp: Your First Step into IoT</strong> at UTHM. Guided 30+ participants.</span><span class="mono tag">Leadership</span></li>
+            <li><span class="mono">2025</span><span><strong>Gold Award, Digital Innovathon Symposium (DINS 2025)</strong> for the NFC-Based Taska Attendance System.</span><span class="mono tag hot">Gold</span></li>
+            <li><span class="mono">2024</span><span><strong>Volunteer Editor, Liquipedia.</strong> Maintaining accurate data for a global esports wiki.</span><span class="mono tag">Community</span></li>
+            <li><span class="mono">2023</span><span><strong>B.CS (Software Engineering) with Honours, UTHM.</strong> CGPA 3.74, graduating 2027.</span><span class="mono tag">Education</span></li>
+            <li><span class="mono">2022</span><span><strong>Foundation in Science (Physical), Kolej Matrikulasi Johor.</strong> CGPA 3.98.</span><span class="mono tag">Education</span></li>
+          </ol>
+
+          <div class="sheet-head sheet-head--sub">
+            <div><p class="mono sec-k"><b>§05</b>Specifications</p><h2 class="disp">Every skill points to where I used it</h2></div>
+          </div>
+          <div class="specs">
+            <div class="specs-main">
+              <table class="tbl">
+                <thead><tr><th class="mono">Skill</th><th class="mono">Where I used it</th></tr></thead>
+                <tbody>
+                  <tr><td>Next.js, React, TypeScript</td><td>Lam Soon</td></tr>
+                  <tr><td>Supabase, PostgreSQL (row-level security)</td><td>Lam Soon</td></tr>
+                  <tr><td>SSO, RBAC, MFA</td><td>Lam Soon application portal</td></tr>
+                  <tr><td>Cloudflare Workers</td><td>Lam Soon</td></tr>
+                  <tr><td>Vitest, Playwright, pgTAP</td><td>Lam Soon</td></tr>
+                  <tr><td>Flutter, Dart</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
+                  <tr><td>Firebase, Firestore</td><td>AgroEzuran, ROTEE, Taska Attendance</td></tr>
+                  <tr><td>ESP32, ESP32-CAM</td><td>AgroEzuran, Taska Attendance</td></tr>
+                  <tr><td>TensorFlow Lite</td><td>AgroEzuran</td></tr>
+                  <tr><td>PHP, MySQL</td><td>Halfday Cafe</td></tr>
+                  <tr><td>JavaFX</td><td>Taska Attendance</td></tr>
+                  <tr><td class="muted">Also experienced with</td><td>Java, Python, C++, Microsoft SQL Server, Node.js, Docker, Git, OpenAI API, Tailwind CSS</td></tr>
+                </tbody>
+              </table>
             </div>
-            <pre class="code-body"><div class="code-line"><span><span class="ck">const</span> <span class="cv">developer</span> = {</span></div><div class="code-line"><span>  <span class="cp">name</span>: <span class="cs">'Khairul Ikmal'</span>,</span></div><div class="code-line"><span>  <span class="cp">focus</span>: <span class="cs">'Full-Stack &amp; IoT'</span>,</span></div><div class="code-line"><span>  <span class="cp">skills</span>: [<span class="cs">'Flutter'</span>, <span class="cs">'React'</span>, <span class="cs">'ESP32'</span>],</span></div><div class="code-line"><span>  <span class="cp">passionate</span>: <span class="ck">true</span>,</span></div><div class="code-line"><span>  <span class="cp">motto</span>: <span class="cs">"Code is craft"</span></span></div><div class="code-line"><span>};</span></div><div class="code-line"><span></span></div><div class="code-line"><span><span class="cv">developer</span>.<span class="cf">showcase</span>();<span class="code-cursor"></span></span></div></pre>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ── About ─────────────────────────────────────── -->
-    <section class="section" id="about">
-      <div class="container">
-        <div class="about-layout">
-          <div class="about-avatar-col reveal">
-            <div class="about-avatar-wrap">
-              <div class="about-glow"></div>
-              <img class="about-avatar-img" src="assets/photo.jpg" alt="Khairul Ikmal" />
-            </div>
-          </div>
-          <div class="about-text-col">
-            <span class="section-label reveal">ABOUT ME</span>
-            <p class="about-bio reveal" style="transition-delay:.06s">
-              Hey, I'm <strong>Khairul Ikmal</strong> — a Software Engineering student at <em>UTHM</em> with a CGPA of 3.7, based in Yong Peng, Johor. I love building things that work <em>and</em> look good doing it, across the full stack: web, mobile, and IoT.
-            </p>
-            <p class="about-bio reveal" style="transition-delay:.12s">
-              My expertise spans Flutter, Firebase, React, PHP, and embedded systems with ESP32. I care deeply about clean architecture, OOP principles, and UX that just makes sense. Gold Award winner at DINS 2025.
-            </p>
-            <p class="about-bio reveal" style="transition-delay:.18s">
-              Seeking an internship opportunity <em>August 2026 – January 2027</em>. Always pushing the boundaries of what's possible as a developer. <em>Code is craft. Design is intention.</em>
-            </p>
-            <div class="about-stats reveal" style="transition-delay:.24s">
-              <div class="stat-item"><span class="stat-k">Based in</span><span class="stat-v">Johor, Malaysia</span></div>
-              <div class="stat-item"><span class="stat-k">CGPA</span><span class="stat-v">3.7 / 4.0</span></div>
-              <div class="stat-item"><span class="stat-k">Status</span><span class="stat-v stat-open">● Open to Internship</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── What I Do ──────────────────────────────────── -->
-    <section class="section what-section" id="what-i-do">
-      <div class="what-bg-text" aria-hidden="true">WHAT I DO</div>
-      <div class="container">
-        <p class="what-label" style="margin-bottom:12px">HANDS ON</p>
-        <h2 class="what-title" style="margin-bottom:48px">What I <span class="accent">Do</span></h2>
-        <div class="services-grid" id="servicesGrid"></div>
-      </div>
-    </section>
-
-    <!-- ── Career Timeline ───────────────────────────── -->
-    <section class="section" id="experience">
-      <div class="container">
-        <h2 class="section-heading reveal">My career &amp; <span class="accent">experience</span></h2>
-        <div class="timeline-wrap" id="timelineList"></div>
-      </div>
-    </section>
-
-    <!-- ── Projects ──────────────────────────────────── -->
-    <section class="section" id="projects">
-      <div class="container">
-        <h2 class="section-heading reveal">My <span class="accent">Work</span></h2>
-        <div class="projects-cols" id="projectsGrid"></div>
-        <div class="projects-more reveal" style="transition-delay:.1s">
-          <a href="projects.html" class="btn-see-more">
-            See All Works →
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Certificates ──────────────────────────────────── -->
-    <section class="cert-section" id="certificates">
-      <div class="container">
-        <p class="tech-label reveal" style="text-align:center">CERTIFICATES &amp; LICENCES</p>
-        <h2 class="tech-title reveal" style="text-align:center;margin-bottom:28px">My <span class="accent">Achievements</span></h2>
-      </div>
-      <div class="cert-marquee">
-        <div class="cert-fade cert-fade--l"></div>
-        <div class="cert-fade cert-fade--r"></div>
-        <div class="cert-row cert-row--fwd" id="certRow1"></div>
-        <div class="cert-row cert-row--rev" id="certRow2"></div>
-      </div>
-    </section>
-
-    <!-- ── Tech Stack ─────────────────────────────────── -->
-    <section class="section tech-section" id="skills">
-      <div class="container">
-        <p class="tech-label reveal">TECH STACK</p>
-        <h2 class="tech-title reveal">My <span class="accent">Skills</span></h2>
-        <div class="sphere-wrap">
-          <div class="sphere-stage" id="techSphere"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Contact ────────────────────────────────────── -->
-    <section class="section contact-section" id="contact">
-      <div class="container">
-        <div class="contact-ctas reveal">
-          <a href="#projects" class="btn-cta btn-cta--dark">Explore Projects →</a>
-          <a href="mailto:Ikmal03411@gmail.com" class="btn-cta btn-cta--purple">Hire Me →</a>
-        </div>
-        <!-- Replace YOUR_FORM_ID with your Formspree ID from formspree.io (free) -->
-        <form class="contact-form reveal" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-          <div class="form-group">
-            <label class="form-label" for="name">NAME</label>
-            <input class="form-input" type="text" id="name" name="name" placeholder="Your name" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="email">EMAIL</label>
-            <input class="form-input" type="email" id="email" name="email" placeholder="your@email.com" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="message">MESSAGE</label>
-            <textarea class="form-input form-textarea" id="message" name="message" placeholder="Tell me about your project or opportunity..." required></textarea>
-          </div>
-          <button class="btn-cta btn-cta--purple form-submit" type="submit">Send Message →</button>
-        </form>
-
-        <div class="contact-footer reveal" style="transition-delay:.08s">
-          <h2 class="contact-name">KHAIRUL IKMAL</h2>
-          <div class="contact-grid">
-            <div>
-              <div class="contact-label">Email</div>
-              <a href="mailto:Ikmal03411@gmail.com" class="contact-val">Ikmal03411@gmail.com</a>
-              <div class="contact-label" style="margin-top:20px">Location</div>
-              <div class="contact-val">Malaysia</div>
-            </div>
-            <div>
-              <div class="contact-label">Social</div>
-              <a href="https://github.com/khairulikmal" target="_blank" rel="noopener" class="contact-social">Github ↗</a>
-              <a href="https://linkedin.com/in/khairul-ikmal-mohmad-215b2a372" target="_blank" rel="noopener" class="contact-social">Linkedin ↗</a>
-            </div>
-            <div>
-              <div class="contact-credit">Designed and Developed<br>by <span class="accent">Khairul Ikmal</span></div>
-              <div class="contact-year">© 2026</div>
+            <div class="specs-side">
+              <table class="tbl">
+                <thead><tr><th class="mono">Training</th><th class="mono">Provider</th></tr></thead>
+                <tbody>
+                  <tr><td>CCNA: Introduction to Networks</td><td class="mono">Cisco</td></tr>
+                  <tr><td>Machine Learning Using SAS Viya</td><td class="mono">SAS</td></tr>
+                </tbody>
+              </table>
+              <table class="tbl" style="margin-top:32px">
+                <thead><tr><th class="mono">Language</th><th class="mono">Level</th></tr></thead>
+                <tbody>
+                  <tr><td>Malay</td><td class="mono">Native</td></tr>
+                  <tr><td>English</td><td class="mono">Proficient</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- CONTACT -->
+    <section class="sec contact" id="contact" data-state="contact">
+      <div class="wrap">
+        <p class="mono sec-k"><b>§06</b>Plug in</p>
+        <h2 class="disp">Hiring a Junior Software Engineer in 2027? Let’s talk.</h2>
+        <a class="mail" href="mailto:ikmal03411@gmail.com">ikmal03411@gmail.com</a>
+        <p class="mono contact-meta">Based in Batu Pahat, Johor · Willing to relocate</p>
+        <div class="actions">
+          <button type="button" class="btn btn-solid" id="copyMail">Copy email</button>
+          <a href="https://linkedin.com/in/khairul-ikmal-mohmad-215b2a372" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
+          <a href="https://github.com/KhairulIkmal" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
+          <a href="resume.pdf" target="_blank" rel="noopener" class="btn">Resume ↓</a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- GSAP + ScrollTrigger for smooth section animations -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <script src="script.js"></script>
+  <footer class="foot">
+    <div class="wrap foot-in mono">
+      <div><span>Designed and built by</span>Khairul Ikmal</div>
+      <div><span>Board</span>KI-01, Rev. 2026.11</div>
+      <div><span>Rendered in</span>Three.js, no 3D models</div>
+      <div><span>Checked by</span>You. Thanks for reading.</div>
+    </div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>
