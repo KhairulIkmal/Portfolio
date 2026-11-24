@@ -247,6 +247,43 @@ function receiptCanvas() {
   return cv;
 }
 
+// A child's NFC card for the Taska tap animation.
+function nfcCardCanvas() {
+  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 322;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#f4f1ea'; g.fillRect(0, 0, 512, 322);
+  g.fillStyle = '#ff5a1f'; g.fillRect(0, 0, 512, 56);
+  g.fillStyle = '#111'; g.font = '700 26px "IBM Plex Mono", monospace'; g.fillText('TASKA ATTENDANCE', 24, 38);
+  g.fillStyle = '#1b1b1b'; g.font = '500 22px "IBM Plex Mono", monospace'; g.fillText('STUDENT CARD', 24, 110);
+  g.font = '700 54px "Archivo", sans-serif'; g.fillText('ID 0412', 24, 186);
+  g.font = '500 18px "IBM Plex Mono", monospace'; g.fillStyle = '#6e6a61'; g.fillText('TAP TO CHECK IN / OUT', 24, 286);
+  // contactless symbol
+  g.strokeStyle = '#1b1b1b'; g.lineWidth = 7; g.lineCap = 'round';
+  for (let i = 0; i < 3; i++) { g.beginPath(); g.arc(380, 170, 30 + i * 26, -0.6, 0.6); g.stroke(); }
+  return cv;
+}
+
+// A leaf with a diseased patch, for the ESP32-CAM detection animation.
+function leafCanvas() {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 384;
+  const g = cv.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 256, 384); grd.addColorStop(0, '#5f9a3a'); grd.addColorStop(1, '#2f6b2a');
+  g.fillStyle = grd; g.fillRect(0, 0, 256, 384);
+  g.strokeStyle = 'rgba(210,235,170,.55)'; g.lineWidth = 4;
+  g.beginPath(); g.moveTo(128, 384); g.lineTo(128, 10); g.stroke();
+  g.lineWidth = 2;
+  for (let y = 320; y > 50; y -= 42) {
+    g.beginPath(); g.moveTo(128, y); g.quadraticCurveTo(170, y - 20, 230, y - 55); g.stroke();
+    g.beginPath(); g.moveTo(128, y); g.quadraticCurveTo(86, y - 20, 26, y - 55); g.stroke();
+  }
+  // blight lesions: brown spots with yellow halos
+  for (const [x, y, r] of [[160, 150, 22], [182, 128, 12], [146, 176, 10], [170, 188, 8]]) {
+    g.fillStyle = 'rgba(226,196,70,.75)'; g.beginPath(); g.arc(x, y, r + 7, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#5a3a1c'; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+  return cv;
+}
+
 function drawOLED(cv, n, phase) {
   const g = cv.getContext('2d');
   g.fillStyle = '#020403'; g.fillRect(0, 0, cv.width, cv.height);
@@ -475,6 +512,8 @@ async function start() {
   }
 
   /* ── NFC1: coil module (Taska Zurah) ─────── */
+  const coilMat = M.gold.clone();
+  coilMat.emissive = new THREE.Color(COL.signal); coilMat.emissiveIntensity = 0;
   const nfc = new THREE.Group();
   const nb = new THREE.Mesh(new THREE.BoxGeometry(1.75, 0.06, 1.3), M.mask2); nfc.add(nb);
   {
@@ -486,13 +525,27 @@ async function start() {
     }
     const path = new THREE.CurvePath();
     for (let i = 0; i < pts.length - 1; i++) path.add(new THREE.LineCurve3(pts[i], pts[i + 1]));
-    const coil = new THREE.Mesh(new THREE.TubeGeometry(path, 400, 0.018, 5, false), M.gold);
+    const coil = new THREE.Mesh(new THREE.TubeGeometry(path, 400, 0.018, 5, false), coilMat);
     coil.position.y = 0.04; coil.scale.y = 0.5; nfc.add(coil);
     const chip = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.06, 0.28), M.die); chip.position.y = 0.06; nfc.add(chip);
     for (const [x, z] of [[-0.8, -0.58], [0.8, -0.58], [-0.8, 0.58], [0.8, 0.58]]) {
       const so = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.14, 10), M.gold); so.position.set(x, -0.08, z); nfc.add(so);
     }
   }
+  // the student card that taps the coil, and the ripple it makes
+  const tapCard = new THREE.Group();
+  tapCard.add(new THREE.Mesh(new RoundedBoxGeometry(0.86, 0.022, 0.54, 3, 0.01), new THREE.MeshStandardMaterial({ color: 0xe9e5dc, roughness: 0.6 })));
+  const cardTex = new THREE.CanvasTexture(nfcCardCanvas()); cardTex.colorSpace = THREE.SRGBColorSpace; cardTex.anisotropy = 8;
+  const cardFace = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.52), new THREE.MeshStandardMaterial({ map: cardTex, color: 0xcfcbc2, roughness: 0.55 }));
+  cardFace.rotation.x = -Math.PI / 2; cardFace.position.y = 0.012; tapCard.add(cardFace);
+  tapCard.visible = false; nfc.add(tapCard);
+  const rippleMat = new THREE.MeshBasicMaterial({ color: COL.signal, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+  const ripple = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.34, 48), rippleMat);
+  ripple.rotation.x = -Math.PI / 2; ripple.position.y = 0.09; nfc.add(ripple);
+  anchor('nfcRead', nfc, -0.35, 0.1, -0.75);
+  const TAPS = [['ID 0412', 'CHECKED IN', '08:02'], ['ID 0415', 'CHECKED IN', '08:05'], ['ID 0412', 'CHECKED OUT', '17:31']];
+  let tapT = 0, tapN = 0, tapped = false;
+
   nfc.position.set(1.72, 0.2, -1.05);
   addPart(nfc, 1.4, { delay: 0.22, tilt: 0.1 });
 
@@ -518,6 +571,43 @@ async function start() {
     const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.12, 0.16, 24), M.plastic); lens.position.set(4.12, 0.29, -0.24); probe.add(lens);
     const glassL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.01, 24), new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.05, metalness: 0.9 }));
     glassL.position.set(4.12, 0.375, -0.24); probe.add(glassL);
+  }
+  // leaf under inspection: scan cone from the lens, sweeping scan line, detection box
+  const leafRig = new THREE.Group();
+  leafRig.position.set(4.12, 0.38, -0.24);
+  {
+    const s = new THREE.Shape();
+    s.moveTo(0, -0.5); s.bezierCurveTo(0.36, -0.3, 0.36, 0.25, 0, 0.55); s.bezierCurveTo(-0.36, 0.25, -0.36, -0.3, 0, -0.5);
+    const lg = new THREE.ShapeGeometry(s, 24);
+    const pos = lg.attributes.position, uv = lg.attributes.uv;
+    for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + 0.36) / 0.72, (pos.getY(i) + 0.5) / 1.05);
+    const leafTex = new THREE.CanvasTexture(leafCanvas()); leafTex.colorSpace = THREE.SRGBColorSpace;
+    var leaf = new THREE.Mesh(lg, new THREE.MeshStandardMaterial({ map: leafTex, roughness: 0.75, side: THREE.DoubleSide }));
+    leaf.position.set(0, 1.05, 0); leaf.rotation.set(-0.75, 0.35, 0.1);
+    leafRig.add(leaf);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0x3d5e2a }));
+    stem.position.set(0, -0.62, 0); stem.rotation.x = 0.1; leaf.add(stem);
+    // scan cone from lens up to the leaf
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.95, 4, 1, true), new THREE.MeshBasicMaterial({ color: COL.signal, transparent: true, opacity: 0.05, side: THREE.DoubleSide, depthWrite: false }));
+    cone.rotation.x = Math.PI; cone.rotation.y = Math.PI / 4; cone.position.y = 0.5; leafRig.add(cone);
+    const coneEdges = new THREE.LineSegments(new THREE.EdgesGeometry(cone.geometry), new THREE.LineBasicMaterial({ color: COL.signal, transparent: true, opacity: 0.45 }));
+    coneEdges.rotation.copy(cone.rotation); coneEdges.position.copy(cone.position); leafRig.add(coneEdges);
+  }
+  // detection box around the lesions (leaf-local coords) and the scan line
+  const boxMat = new THREE.LineBasicMaterial({ color: COL.signal, transparent: true, opacity: 0 });
+  const bx = 0.13, by = 0.21, bw = 0.15, bh = 0.13;
+  const detBox = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(bx - bw, by - bh, 0.01), new THREE.Vector3(bx + bw, by - bh, 0.01), new THREE.Vector3(bx + bw, by + bh, 0.01), new THREE.Vector3(bx - bw, by + bh, 0.01),
+  ]), boxMat);
+  leaf.add(detBox);
+  const scanMat = new THREE.MeshBasicMaterial({ color: COL.signal, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false });
+  const scanLine = new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.012), scanMat);
+  scanLine.position.z = 0.012; leaf.add(scanLine);
+  leafRig.scale.setScalar(0.001); leafRig.visible = false;
+  probe.add(leafRig);
+  const SCANS = [['BLIGHT', 94], ['LEAF SPOT', 89], ['BLIGHT', 97]];
+  let scanT = 0, scanN = 0, scanDone = false;
+  {
     for (const z of [-0.28, 0.28]) {
       const prong = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.06, 0.26), M.mask2); prong.position.set(5.4, 0.12, z); probe.add(prong);
       const tip = new THREE.Mesh(new THREE.CylinderGeometry(0, 0.13, 0.3, 4), M.mask2);
@@ -565,9 +655,9 @@ async function start() {
     hero:    { c: [4.0, 9.0, 13.5],  t: [-3.0, -0.2, 0.6],  ry: -0.42, ex: 0,    lb: 0, f: [0.6, 0.6, 0.6, 0.3, 0.6], spin: 0 },
     build:   { c: [10.9, 9.0, 9.1],  t: [0.8, 0.4, -1.5],  ry: 0.12,  ex: 1,    lb: 1, f: [0.3, 0.3, 0.3, 0.3, 0.3], spin: 0 },
     xp:      { c: [-3.8, 5.4, 5.5],  t: [-3.3, 0.0, 0.65], ry: 0,     ex: 0.3,  lb: 0, f: [1.2, 1.2, 1.2, 0.3, 0.3], spin: 0 },
-    probe:   { c: [2.4, 6.4, 6.0],   t: [2.9, 0.0, 0.1],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 1.8, 0.2, 0.2, 0.2], spin: 0 },
+    probe:   { c: [2.6, 6.2, 6.2],   t: [3.1, 0.55, 0.0],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 1.8, 0.2, 0.2, 0.2], spin: 0 },
     xtal:    { c: [-5.3, 5.0, 5.6],  t: [-4.8, 0.0, 0.7], ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 0.2, 1.8, 0.2], spin: 0 },
-    nfc:     { c: [-0.4, 5.2, 4.2],  t: [0.1, 0.0, -0.7],  ry: 0,     ex: 0,    lb: 0, f: [1.8, 0.2, 0.2, 0.2, 0.2], spin: 0 },
+    nfc:     { c: [0.2, 4.1, 2.4],   t: [0.5, 0.35, -1.0],  ry: 0,     ex: 0,    lb: 0, f: [1.8, 0.2, 0.2, 0.2, 0.2], spin: 0 },
     printer: { c: [0.2, 3.0, 0.2],    t: [0.7, 0.7, -3.1],  ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 0.2, 0.2, 1.8], spin: 0 },
     oled:    { c: [-0.4, 5.6, 5.6],  t: [0.1, 0.0, 0.7],   ry: 0,     ex: 0,    lb: 0, f: [0.2, 0.2, 1.8, 0.2, 0.2], spin: 0 },
     record:  { c: [0.5, 15, 7],      t: [0.5, 0.0, 0.0],   ry: 0.0,   ex: 0.25, lb: 0, f: [0.5, 0.5, 0.5, 0.5, 0.5], spin: 0 },
@@ -634,12 +724,18 @@ async function start() {
     el.className = 'readout';
     el.innerHTML = `<p class="mono">${title} <i class="led"></i></p><dl>${rows.map((r, i) => `<dt class="mono">${r}</dt><dd>${init[i]}</dd>`).join('')}</dl><p class="mono ro-note">Simulated</p>`;
     document.body.appendChild(el);
-    readouts.push({ el, anchorId, fi, dd: [...el.querySelectorAll('dd')], tick, t: 0 });
+    const r = { el, anchorId, fi, dd: [...el.querySelectorAll('dd')], tick, t: 0 };
+    readouts.push(r);
+    return r;
   }
+
+  // Taska: updated by the tap animation, not on a timer
+  const nfcRO = makeReadout('nfcRead', 0, 'NFC1 · check-in', ['Card', 'Status', 'Parent'], ['ID 0412', 'WAITING', '—'], () => {});
+
 
   // AgroEzuran: irrigate only when the soil is dry AND rain isn't coming
   const farm = { soil: 41.8, rain: 30 };
-  makeReadout('probe', 1, 'P1 · field node', ['Soil', 'Rain chance', 'Pump'], ['41.8%', '30%', 'IDLE'], (dd) => {
+  const probeRO = makeReadout('probe', 1, 'P1 · field node', ['Soil', 'Rain chance', 'Pump', 'Leaf scan'], ['41.8%', '30%', 'IDLE', 'SCANNING…'], (dd) => {
     farm.soil = Math.max(30, Math.min(60, farm.soil + (Math.random() - 0.62) * 1.4));
     farm.rain = Math.max(0, Math.min(95, Math.round(farm.rain + (Math.random() - 0.5) * 18)));
     let pump = 'IDLE';
@@ -782,6 +878,57 @@ async function start() {
     paper.scale.y = Math.max(0.001, pp);
     rTex.repeat.set(1, Math.max(0.001, pp)); rTex.offset.set(0, 1 - pp);
     prLedMat.emissiveIntensity = (printT < 3 && !REDUCE) ? (Math.floor(t * 6) % 2 ? 3 : 0.4) : 1.2;
+
+    // Taska: the card drops onto the coil, the coil flashes, the check-in is logged
+    const nfcFocus = smooth((cur.f[0] - 0.9) / 0.6);
+    tapCard.visible = nfcFocus > 0.01;
+    if (tapCard.visible) {
+      if (!REDUCE) tapT += dt;
+      const c = tapT % 3.2;
+      const down = c < 0.7 ? smooth(c / 0.7) : c < 1.6 ? 1 : c < 2.3 ? 1 - smooth((c - 1.6) / 0.7) : 0;
+      tapCard.position.set(0.05, 0.12 + (1 - down) * 0.75, 0.05);
+      tapCard.rotation.set((1 - down) * -0.35, 0.15, (1 - down) * 0.12);
+      tapCard.scale.setScalar(Math.max(0.001, nfcFocus));
+      const on = !REDUCE && c >= 0.7 && c < 1.6;
+      if (on && !tapped) {
+        tapped = true;
+        const tp = TAPS[tapN++ % TAPS.length];
+        nfcRO.dd[0].textContent = tp[0];
+        nfcRO.dd[1].textContent = tp[1];
+        nfcRO.dd[2].textContent = `NOTIFIED ${tp[2]}`;
+        nfcRO.dd[1].classList.add('sig');
+      }
+      if (!on) tapped = false;
+      const rp = on ? (c - 0.7) / 0.9 : 0;
+      ripple.scale.setScalar(1 + rp * 2.2);
+      rippleMat.opacity = on ? (1 - rp) * 0.9 : 0;
+      coilMat.emissiveIntensity = on ? 1.6 * (1 - rp * 0.6) : 0;
+    } else { coilMat.emissiveIntensity = 0; rippleMat.opacity = 0; }
+
+    // AgroEzuran: the camera scans a leaf, then boxes the diseased patch
+    const leafFocus = smooth((cur.f[1] - 0.9) / 0.6);
+    leafRig.visible = leafFocus > 0.01;
+    if (leafRig.visible) {
+      leafRig.scale.setScalar(Math.max(0.001, leafFocus));
+      leaf.position.y = 1.05 + Math.sin(t * 1.3) * 0.03 * motion;
+      if (!REDUCE) scanT += dt;
+      const c = scanT % 3.4;
+      const sweeping = !REDUCE && c < 1.6;
+      scanLine.visible = sweeping;
+      scanLine.position.y = -0.48 + (c / 1.6) * 1.0;
+      boxMat.opacity = sweeping ? 0 : 0.65 + 0.35 * Math.sin(t * 8) * motion;
+      if (!sweeping && !scanDone) {
+        scanDone = true;
+        const sc = SCANS[scanN++ % SCANS.length];
+        probeRO.dd[3].textContent = `${sc[0]} ${sc[1]}%`;
+        probeRO.dd[3].classList.add('sig');
+      }
+      if (sweeping && scanDone) {
+        scanDone = false;
+        probeRO.dd[3].textContent = 'SCANNING…';
+        probeRO.dd[3].classList.remove('sig');
+      }
+    }
 
     // floating readouts
     for (const r of readouts) {
