@@ -381,7 +381,7 @@ main, .bar, .foot { position: relative; z-index: 1; }
 }
 
 /* logos on light plates, so every logo reads the same on the dark theme */
-.plate { display: inline-flex; align-items: center; justify-content: center; flex: none; background: #ede9e0; border-radius: 6px; padding: 6px; height: 64px; box-sizing: border-box; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.plate { display: inline-flex; align-items: center; justify-content: center; flex: none; background: #fff; border-radius: 6px; padding: 6px; height: 64px; box-sizing: border-box; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
 .plate img { display: block; height: 100%; width: auto; }
 .plate img.crop-top { width: auto; height: 100%; aspect-ratio: 190 / 52; object-fit: cover; object-position: 50% 100%; }
 .plate-sm { height: 46px; padding: 5px 7px; align-self: flex-start; margin-bottom: 12px; }
