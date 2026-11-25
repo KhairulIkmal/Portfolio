@@ -1130,117 +1130,260 @@ function initScope() {
   update();
 }
 
-// Skills: hover a project to light its pins, or a pin to light its projects.
-// When a project lights up, traces run from its button down the side of the board into each pin it used.
-function initPinout() {
-  const box = document.getElementById('pinout');
+// §06 Stack: four boards (device, cloud, apps, quality) start stacked and tilted. Scrolling pulls them apart,
+// drops a data packet from the sensor down to a phone screen, then lays the boards flat. Once flat,
+// hovering a project wires it to every skill it used, and hovering a skill wires it back to its projects.
+function initStack() {
+  const box = document.getElementById('stack');
   if (!box) return;
-  const btns = [...box.querySelectorAll('button[data-p]')];
-  const pins = [...box.querySelectorAll('li[data-p]')];
-  const uses = (li, p) => li.dataset.p.split(' ').includes(p);
-  const svg = box.querySelector('.pin-wires');
-  const baseL = svg && svg.querySelector('.wire-base'), hotL = svg && svg.querySelector('.wire-hot');
+  const pin = box.querySelector('.stack-pin');
+  const stage = box.querySelector('.stack-stage');
+  const scene = box.querySelector('.stack-scene');
+  const layers = [...box.querySelectorAll('.layer')];
+  const cover = box.querySelector('.layer-cover');
+  const cap = box.querySelector('.stack-cap');
+  const screenEl = box.querySelector('.sk-screen');
+  const btns = [...box.querySelectorAll('.stack-projects button[data-p]')];
+  const chips = [...box.querySelectorAll('.sk[data-p]')];
+  const svg = box.querySelector('.stack-wires'), hotL = svg.querySelector('.wire-hot');
+  const uses = (el, p) => el.dataset.p.split(' ').includes(p);
+  const span = (p, a, b) => clamp01((p - a) / (b - a));
+  const lerp = (a, b, t) => a + (b - a) * t;
   const NS = 'http://www.w3.org/2000/svg';
-  let wires = [];
-  let state = null, locked = null, touched = false, demo = null;
+  const small = matchMedia('(max-width: 860px)');
 
-  // a polyline with rounded corners, like a routed PCB trace
-  function trace(pts, r = 8) {
-    let d = `M${pts[0][0]} ${pts[0][1]}`;
-    for (let k = 1; k < pts.length - 1; k++) {
-      const [px, py] = pts[k - 1], [x, y] = pts[k], [nx, ny] = pts[k + 1];
+  chips.forEach((el) => {
+    const n = el.dataset.p.split(' ').length;
+    const d = document.createElement('span');
+    d.className = 'w-dots';
+    d.title = `Used in ${n} project${n > 1 ? 's' : ''}`;
+    d.innerHTML = '<i></i>'.repeat(n);
+    el.appendChild(d);
+  });
+
+  // ---------- the packet's route: sensor -> model -> API -> database -> sync -> app -> screen ----------
+  const ROUTE = [
+    { id: 'iot', cap: 'A sensor reading leaves the device' },
+    { id: 'ml', cap: 'An on-device model checks it first' },
+    { via: true },
+    { id: 'api', cap: 'An API carries it up to the cloud' },
+    { id: 'db', cap: 'The database stores it' },
+    { via: true },
+    { id: 'rt', cap: 'Real-time sync pushes it out' },
+    { id: 'mobile', cap: 'The app picks it up' },
+    { id: 'screen', cap: 'And it lands on a screen' },
+  ];
+  const get = (id) => (id === 'screen' ? screenEl : box.querySelector(`.sk[data-id="${id}"]`));
+  let pts = [], segs = [], packet = null, T = [], fit = 1, sceneH = 0;
+
+  function measure() {
+    T = layers.map((l) => l.offsetTop);
+    sceneH = scene.offsetHeight;
+    // shrink the flat stack on short screens so the whole thing fits in the pinned view
+    const outer = (el) => { const s = getComputedStyle(el); return el.offsetHeight + parseFloat(s.marginTop) + parseFloat(s.marginBottom); };
+    const other = [...pin.children].filter((el) => el !== stage).reduce((sum, el) => sum + outer(el), 0) + 20;
+    fit = box.classList.contains('is-scroll') ? Math.min(1, (innerHeight - 64 - other) / sceneH) : 1;
+    stage.style.height = box.classList.contains('is-scroll') ? `${sceneH * fit}px` : '';
+    // packet route in scene coordinates (all boards overlap at the first board while stacked)
+    pts = [];
+    ROUTE.forEach((r, k) => {
+      if (r.via) {
+        const prev = pts[pts.length - 1];
+        const next = get(ROUTE[k + 1].id);
+        pts.push({ x: prev.x, y: prev.y, L: layers.indexOf(next.closest('.layer')) });
+        return;
+      }
+      const el = get(r.id), L = el.closest('.layer');
+      pts.push({ x: L.offsetLeft + el.offsetLeft + el.offsetWidth / 2, y: T[0] + el.offsetTop + el.offsetHeight / 2, L: layers.indexOf(L), el, cap: r.cap });
+    });
+    scene.querySelectorAll('.fx-seg, .fx-via, .fx-packet').forEach((e) => e.remove());
+    segs = pts.slice(1).map((pt, k) => {
+      const e = document.createElement('div');
+      e.className = pt.L !== pts[k].L ? 'fx-via' : 'fx-seg';
+      scene.appendChild(e);
+      return e;
+    });
+    packet = document.createElement('div');
+    packet.className = 'fx-packet';
+    scene.appendChild(packet);
+  }
+
+  let flat = false, mode = '';
+  function setMode() {
+    const m = REDUCE || small.matches ? 'static' : 'scroll';
+    if (m === mode) return;
+    mode = m;
+    box.classList.toggle('is-scroll', m === 'scroll');
+    box.classList.toggle('is-static', m === 'static');
+    if (m === 'static') {
+      scene.style.transform = '';
+      layers.forEach((l) => { l.style.transform = ''; });
+      scene.querySelectorAll('.fx-seg, .fx-via, .fx-packet').forEach((e) => e.remove());
+      chips.forEach((c) => c.classList.remove('hit'));
+    }
+  }
+
+  function frame() {
+    if (mode !== 'scroll') { setFlat(true); return; }
+    const r = box.getBoundingClientRect();
+    const p = clamp01((64 - r.top) / Math.max(1, r.height - (innerHeight - 64)));
+    const e = smooth(span(p, 0.05, 0.28));      // boards pull apart
+    const q = span(p, 0.32, 0.7);               // packet travels
+    const f = smooth(span(p, 0.75, 0.93));      // boards lie flat
+    const gap = lerp(10, 92, e);
+    const z = (L) => (layers.length - 1 - L) * gap;
+
+    const rx = 56 * (1 - f), rz = -32 * (1 - f), sc = lerp(0.6, fit, f);
+    const lift = ((sceneH - layers[0].offsetHeight) * 0.42 + (layers.length - 1) * gap * 0.5) * (1 - f);
+    scene.style.transform = f >= 1 ? (fit < 1 ? `scale(${fit})` : 'none')
+      : `translateY(${lift}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc})`;
+    layers.forEach((l, i) => {
+      l.style.transform = f >= 1 ? 'none' : `translate3d(0, ${-(T[i] - T[0]) * (1 - f)}px, ${z(i) * (1 - f)}px)`;
+    });
+    cover.style.opacity = String(1 - span(e, 0, 0.55));
+
+    // packet: walk the route in 3D, revealing the trace behind it
+    const P = pts.map((pt) => [pt.x, pt.y, z(pt.L)]);
+    const lens = P.slice(1).map((b, k) => Math.hypot(b[0] - P[k][0], b[1] - P[k][1], b[2] - P[k][2]));
+    const total = lens.reduce((a, b) => a + b, 0);
+    let d = q * total, acc = 0, cur = P[0];
+    const fade = String(1 - f);
+    segs.forEach((el, k) => {
+      const a = P[k], b = P[k + 1], len = lens[k];
+      const t = clamp01((d - acc) / (len || 1));
+      if (t > 0 && t <= 1 && d >= acc) cur = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+      if (el.className === 'fx-via') {
+        el.style.height = `${a[2] - b[2]}px`;
+        el.style.transform = `translate3d(${a[0]}px, ${a[1]}px, ${a[2]}px) rotateX(-90deg) scaleY(${t})`;
+      } else {
+        el.style.width = `${len}px`;
+        el.style.transform = `translate3d(${a[0]}px, ${a[1]}px, ${a[2]}px) rotate(${Math.atan2(b[1] - a[1], b[0] - a[0])}rad) scaleX(${t})`;
+      }
+      el.style.opacity = t > 0 ? fade : '0';
+      acc += len;
+    });
+    packet.style.opacity = q > 0 && q < 1 && f < 1 ? '1' : '0';
+    packet.style.transform = `translate3d(${cur[0]}px, ${cur[1]}px, ${cur[2] + 2}px) rotateZ(${-rz}deg) rotateX(${-rx}deg)`;
+
+    // light each part the packet has reached, and caption the step
+    let reached = -1; acc = 0;
+    pts.forEach((pt, k) => {
+      if (k) acc += lens[k - 1];
+      const on = q > 0 && d >= acc - 1 && f < 1;
+      if (pt.el) pt.el.classList.toggle(pt.el === screenEl ? 'live' : 'hit', on);
+      if (on && pt.cap) reached = k;
+    });
+    let text = '';
+    if (f > 0.02) text = '<b>04</b>Hover a project to see what it used';
+    else if (reached >= 0) text = `<b>${String(ROUTE.slice(0, reached + 1).filter((r) => !r.via).length).padStart(2, '0')}</b>${pts[reached].cap}`;
+    else if (e > 0.05) text = '<b>01</b>Four boards, one system';
+    else text = '<b>00</b>Scroll to take it apart';
+    if (cap.innerHTML !== text) cap.innerHTML = text;
+    setFlat(f >= 1);
+  }
+
+  // ---------- flat: wire projects to skills ----------
+  let wires = [];
+  function trace(P, r = 8) {
+    let d = `M${P[0][0]} ${P[0][1]}`;
+    for (let k = 1; k < P.length - 1; k++) {
+      const [px, py] = P[k - 1], [x, y] = P[k], [nx, ny] = P[k + 1];
       const a = Math.min(r, Math.hypot(x - px, y - py) / 2), b = Math.min(r, Math.hypot(nx - x, ny - y) / 2);
       const ux = Math.sign(x - px), uy = Math.sign(y - py), vx = Math.sign(nx - x), vy = Math.sign(ny - y);
       d += ` L${x - ux * a} ${y - uy * a} Q${x} ${y} ${x + vx * b} ${y + vy * b}`;
     }
-    const [lx, ly] = pts[pts.length - 1];
+    const [lx, ly] = P[P.length - 1];
     return d + ` L${lx} ${ly}`;
   }
-
-  function layout() {
-    if (!svg) return;
-    baseL.innerHTML = ''; hotL.innerHTML = ''; wires = [];
-    if (getComputedStyle(svg).display === 'none') return;
-    const R = box.getBoundingClientRect();
-    svg.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`);
-    const rel = (r) => ({ l: r.left - R.left, r: r.right - R.left, t: r.top - R.top, b: r.bottom - R.top });
-    const boardTop = rel(box.querySelector('.pin-board').getBoundingClientRect()).t;
-    const GAP = 11, EDGE = 6;
-    // skip the traces when the side lanes would run into the pin names (narrow laptops)
-    const names = pins.map((li) => rel(li.querySelector('.pin-name').getBoundingClientRect()));
-    const leftRoom = Math.min(...names.filter((_, k) => li(k).closest('.pins-l')).map((n) => n.l));
-    const rightRoom = R.width - Math.max(...names.filter((_, k) => li(k).closest('.pins-r')).map((n) => n.r));
-    function li(k) { return pins[k]; }
-    if (Math.min(leftRoom, rightRoom) < EDGE + GAP * btns.length + 14) { svg.classList.add('off'); return; }
-    svg.classList.remove('off');
-
+  function layoutWires() {
+    hotL.innerHTML = ''; wires = [];
+    if (small.matches) return;
+    const S = stage.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${S.width} ${S.height}`);
+    const rel = (el) => { const r = el.getBoundingClientRect(); return { l: r.left - S.left, r: r.right - S.left, t: r.top - S.top, b: r.bottom - S.top }; };
+    const row = rel(box.querySelector('.stack-projects'));
     btns.forEach((b, i) => {
-      const br = rel(b.getBoundingClientRect());
-      const bx = (br.l + br.r) / 2, yb = boardTop - 8 - i * 2.6;
-      pins.forEach((p, k) => {
-        if (!uses(p, b.dataset.p)) return;
-        const n = names[k], py = (n.t + n.b) / 2;
-        const left = !!p.closest('.pins-l');
-        const lx = left ? EDGE + i * GAP : R.width - EDGE - i * GAP;
-        const ex = left ? n.l - 10 : n.r + 10;
-        const d = trace([[bx, br.b], [bx, yb], [lx, yb], [lx, py], [ex, py]]);
-        const base = document.createElementNS(NS, 'path');
-        base.setAttribute('d', d);
-        baseL.appendChild(base);
+      let from = rel(b), exitY = row.b + 4 + i * 2.2;
+      chips.filter((c) => uses(c, b.dataset.p)).forEach((c, k) => {
+        const to = rel(c), cy = (to.t + to.b) / 2, lane = to.l - 9;
+        const fx = (from.l + from.r) / 2;
+        const d = trace([[fx, from.b], [fx, exitY], [lane, exitY], [lane, cy], [to.l, cy]]);
         const g = document.createElementNS(NS, 'g');
         for (const cls of ['w-glow', 'w-flow']) {
           const path = document.createElementNS(NS, 'path');
           path.setAttribute('d', d); path.setAttribute('class', cls);
           g.appendChild(path);
         }
-        const dot = document.createElementNS(NS, 'circle');
-        dot.setAttribute('cx', ex); dot.setAttribute('cy', py); dot.setAttribute('r', 3.5);
-        g.appendChild(dot);
         hotL.appendChild(g);
         g.style.setProperty('--len', g.firstChild.getTotalLength().toFixed(1));
-        wires.push({ p: b.dataset.p, li: p, g });
+        g.style.setProperty('--d', `${(k * 0.16).toFixed(2)}s`);
+        wires.push({ p: b.dataset.p, chip: c, g });
+        from = to; exitY = to.b + 5;
       });
     });
     apply();
   }
 
+  let state = null, locked = null, touched = false, demo = null, demoStarted = false;
   function apply() {
-    const s = state;
+    const s = flat ? state : null;
     box.classList.toggle('active', !!s);
-    pins.forEach((p) => p.classList.toggle('on', !!s && (s.p ? uses(p, s.p) : p === s.li)));
-    btns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? b.dataset.p === s.p : uses(s.li, b.dataset.p))));
-    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.li === s.li)));
+    chips.forEach((c) => c.classList.toggle('on', !!s && (s.p ? uses(c, s.p) : c === s.chip)));
+    btns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? b.dataset.p === s.p : uses(s.chip, b.dataset.p))));
+    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.chip === s.chip)));
+  }
+  function setFlat(v) {
+    if (v === flat) return;
+    flat = v;
+    box.classList.toggle('is-flat', v);
+    if (v) {
+      layoutWires();
+      if (mode === 'scroll') startDemo(); else onVisible(box, startDemo, 0.3);
+    } else { clearInterval(demo); apply(); }
+  }
+  function startDemo() {
+    if (demoStarted || touched || REDUCE) return;
+    demoStarted = true;
+    let i = 0;
+    demo = setInterval(() => {
+      if (touched || !flat) return clearInterval(demo);
+      if (i >= btns.length) { clearInterval(demo); state = locked ? { p: locked } : null; apply(); return; }
+      state = { p: btns[i++].dataset.p }; apply();
+    }, 1500);
   }
   const showProject = (p) => { state = p ? { p } : null; apply(); };
-  const showSkill = (li) => { state = { li }; apply(); };
   const stopDemo = () => { touched = true; clearInterval(demo); };
-
   btns.forEach((b) => {
     b.addEventListener('mouseenter', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('focus', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('mouseleave', () => showProject(locked));
+    b.addEventListener('blur', () => showProject(locked));
     b.addEventListener('click', () => { stopDemo(); locked = locked === b.dataset.p ? null : b.dataset.p; showProject(locked); });
   });
-  pins.forEach((p) => {
-    p.addEventListener('mouseenter', () => { stopDemo(); showSkill(p); });
-    p.addEventListener('mouseleave', () => showProject(locked));
+  chips.forEach((c) => {
+    c.addEventListener('mouseenter', () => { stopDemo(); state = { chip: c }; apply(); });
+    c.addEventListener('mouseleave', () => showProject(locked));
   });
 
-  if (svg) {
-    new ResizeObserver(layout).observe(box);
-    document.fonts && document.fonts.ready.then(layout);
-    layout();
+  let raf = 0;
+  const tick = () => { raf = 0; frame(); };
+  const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  function relayout() {
+    setMode();
+    const wasFlat = flat;
+    if (mode === 'scroll') {
+      scene.style.transform = 'none';
+      layers.forEach((l) => { l.style.transform = 'none'; });
+      measure();
+    } else stage.style.height = '';
+    frame();
+    if (wasFlat && flat) layoutWires();
   }
-
-  // Until someone interacts, cycle through the projects once it scrolls into view.
-  if (!REDUCE) onVisible(box, () => {
-    let i = 0;
-    demo = setInterval(() => {
-      if (touched) return clearInterval(demo);
-      if (i >= btns.length) { clearInterval(demo); showProject(null); return; }
-      showProject(btns[i++].dataset.p);
-    }, 1600);
-  }, 0.4);
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', relayout);
+  small.addEventListener('change', relayout);
+  if (document.fonts) document.fonts.ready.then(relayout);
+  relayout();
 }
 
 // Case files: a full-screen overlay per project with a photo gallery and the full story.
@@ -1408,7 +1551,7 @@ function initUI() {
   initChips();
   initLogLogos();
   initScope();
-  initPinout();
+  initStack();
   initCaseFiles();
 }
 
