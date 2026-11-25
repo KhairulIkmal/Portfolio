@@ -1041,11 +1041,12 @@ function initScope() {
       title: strong.replace(/\.$/, ''),
       detail: li.children[1].textContent.replace(strong, '').trim(),
       kind: li.dataset.kind,
+      short: li.dataset.short || li.dataset.kind,
       logo: li.dataset.logo || '',
       crop: li.dataset.crop || '',
     };
   });
-  const HEIGHT = { Gold: 165, Experience: 140, Hackathon: 118, Leadership: 96, Education: 78, Community: 68 };
+  const HEIGHT = { Gold: 142, Experience: 122, Hackathon: 104, Leadership: 86, Education: 70, Community: 60 };
   const W = 1000, H = 220, BASE = 186;
   const xs = items.map((_, i) => 70 + i * (860 / (items.length - 1)));
 
@@ -1072,11 +1073,16 @@ function initScope() {
     m.className = 'scope-mark';
     m.style.left = `${x / W * 100}%`;
     m.style.top = `${(BASE - (HEIGHT[items[i].kind] || 70)) / H * 100}%`;
-    m.addEventListener('mouseenter', () => { hover = i; show(i); });
-    m.addEventListener('mouseleave', () => { hover = -1; show(active); });
+    const lbl = document.createElement('span');
+    lbl.className = 'scope-lbl';
+    lbl.textContent = items[i].short;
+    m.appendChild(lbl);
     marksEl.appendChild(m);
-    const y = document.createElement('span'); y.className = 'scope-yr'; y.style.left = m.style.left; y.textContent = items[i].year;
-    marksEl.appendChild(y);
+    // the year only where it changes, so the axis doesn't repeat "2026" four times
+    if (!i || items[i - 1].year !== items[i].year) {
+      const y = document.createElement('span'); y.className = 'scope-yr'; y.style.left = m.style.left; y.textContent = items[i].year;
+      marksEl.appendChild(y);
+    }
     return m;
   });
 
@@ -1089,7 +1095,7 @@ function initScope() {
     shown = i;
     marks.forEach((m, k) => m.classList.toggle('on', k === i));
     if (rLogo) { const it = items[i]; rLogo.hidden = !(it && it.logo); if (it && it.logo) { rLogoImg.src = it.logo; rLogoImg.className = it.crop === 'top' ? 'crop-top' : ''; } }
-    if (i < 0) { rYear.textContent = 'Signal idle'; rTitle.textContent = 'Scroll to scan'; rDetail.textContent = 'Each spike is a milestone. Gold awards spike highest.'; return; }
+    if (i < 0) { rYear.textContent = 'Signal idle'; rTitle.textContent = 'Scroll to scan'; rDetail.textContent = 'Each spike is a milestone. Hover one to read it; gold awards spike highest.'; return; }
     const it = items[i];
     rYear.textContent = `${it.year} · ${it.kind}`;
     rTitle.textContent = it.title;
@@ -1098,6 +1104,17 @@ function initScope() {
 
   document.querySelector('.sheet')?.classList.add('has-scope');
   const screen = svg.parentElement;
+  // anywhere on the screen snaps to the nearest spike, so nobody has to aim for a dot
+  const nearest = (clientX) => {
+    const r = screen.getBoundingClientRect();
+    const x = (clientX - r.left) / r.width * W;
+    let best = 0;
+    xs.forEach((v, i) => { if (Math.abs(v - x) < Math.abs(xs[best] - x)) best = i; });
+    return best;
+  };
+  screen.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') { hover = nearest(e.clientX); show(hover); } });
+  screen.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hover = -1; show(active); } });
+  screen.addEventListener('click', (e) => { hover = nearest(e.clientX); show(hover); });
   function update() {
     const r = screen.getBoundingClientRect();
     const p = REDUCE ? 1 : clamp01((innerHeight * 0.9 - r.top) / (innerHeight * 0.55));
