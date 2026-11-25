@@ -1156,6 +1156,165 @@ function initPinout() {
   }, 0.4);
 }
 
+// Case files: a full-screen overlay per project with a photo gallery and the full story.
+// Photos are found automatically: assets/work/<slug>/01.jpg, 02.jpg, … (stops at the first gap).
+// Captions and "what broke" text are optional and live here.
+const CASE_NOTES = {
+  'agroezuran':     { captions: [], broke: '' },
+  'dapur-kayu-mak': { captions: [], broke: '' },
+  'rotee':          { captions: [], broke: '' },
+  'taska':          { captions: [], broke: '' },
+  'halfday-cafe':   { captions: [], broke: '' },
+};
+const MAX_PHOTOS = 12;
+const DRAFT = document.documentElement.classList.contains('draft');
+
+function initCaseFiles() {
+  const cf = document.getElementById('caseFile');
+  if (!cf) return;
+  const $ = (id) => document.getElementById(id);
+  const ui = {
+    no: $('cfNo'), title: $('cfTitle'), award: $('cfAward'), hook: $('cfHook'), overview: $('cfOverview'),
+    broke: $('cfBroke'), brokeText: $('cfBrokeText'), tech: $('cfTech'), part: $('cfPart'), links: $('cfLinks'),
+    stage: $('cfStage'), img: $('cfImg'), prev: $('cfPrev'), next: $('cfNext'), count: $('cfCount'),
+    cap: $('cfCap'), thumbs: $('cfThumbs'), empty: $('cfEmpty'),
+  };
+  const photoCache = {};
+  let photos = [], idx = 0, current = null, opener = null, openedHere = false;
+
+  // Find 01.jpg, 02.jpg, … for a project; resolves with the list of URLs that loaded.
+  function findPhotos(slug) {
+    if (photoCache[slug]) return photoCache[slug];
+    photoCache[slug] = new Promise((resolve) => {
+      const found = [];
+      const tryN = (n) => {
+        if (n > MAX_PHOTOS) return resolve(found);
+        const src = `assets/work/${slug}/${String(n).padStart(2, '0')}.jpg`;
+        const im = new Image();
+        im.onload = () => { found.push(src); tryN(n + 1); };
+        im.onerror = () => resolve(found);
+        im.src = src;
+      };
+      tryN(1);
+    });
+    return photoCache[slug];
+  }
+
+  function show(i) {
+    if (!photos.length) return;
+    idx = (i + photos.length) % photos.length;
+    ui.img.src = photos[idx];
+    const caps = (CASE_NOTES[current] || {}).captions || [];
+    ui.img.alt = caps[idx] || `${ui.title.textContent}, photo ${idx + 1}`;
+    ui.cap.textContent = `Fig. ${idx + 1}${caps[idx] ? ' — ' + caps[idx] : ''}`;
+    ui.count.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}`;
+    [...ui.thumbs.children].forEach((t, k) => t.setAttribute('aria-current', String(k === idx)));
+  }
+
+  function fill(slug) {
+    const btn = document.querySelector(`[data-open-case="${slug}"]`);
+    const card = btn && btn.closest('.card');
+    if (!card) return false;
+    current = slug;
+    const q = (s) => card.querySelector(s);
+    const no = (q('.card-no span') || {}).textContent || '';
+    ui.no.textContent = `Case file · ${no.replace('§03 · ', '')}`;
+    ui.title.textContent = q('h3').textContent;
+    ui.award.textContent = (q('.card-award') || {}).textContent || '';
+    ui.hook.textContent = (q('.hook') || {}).textContent || '';
+    ui.overview.textContent = (q('.more p') || {}).textContent || '';
+    ui.tech.innerHTML = [...card.querySelectorAll('.chips li')].map((li) => `<li>${li.textContent}</li>`).join('');
+    ui.part.innerHTML = (q('.part') || {}).innerHTML || '';
+    ui.links.innerHTML = '';
+    card.querySelectorAll('.card-actions a').forEach((a) => ui.links.appendChild(a.cloneNode(true)));
+
+    const broke = (CASE_NOTES[slug] || {}).broke || '';
+    ui.broke.hidden = !broke && !DRAFT;
+    ui.broke.classList.toggle('cf-todo', !broke);
+    ui.brokeText.textContent = broke || 'Author note: write a few lines on one real problem you hit in this project and how you fixed it.';
+
+    // gallery
+    photos = []; ui.thumbs.innerHTML = ''; ui.img.removeAttribute('src');
+    cf.classList.add('cf-loading'); cf.classList.remove('cf-nophotos');
+    findPhotos(slug).then((list) => {
+      if (current !== slug) return;
+      photos = list;
+      cf.classList.remove('cf-loading');
+      cf.classList.toggle('cf-nophotos', !list.length);
+      cf.classList.toggle('cf-single', list.length === 1);
+      ui.empty.textContent = DRAFT && !list.length ? `No photos yet. Add assets/work/${slug}/01.jpg, 02.jpg, 03.jpg …` : '';
+      list.forEach((src, k) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'cf-thumb';
+        b.setAttribute('aria-label', `Photo ${k + 1}`);
+        b.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
+        b.addEventListener('click', () => show(k));
+        ui.thumbs.appendChild(b);
+      });
+      show(0);
+    });
+    return true;
+  }
+
+  function reveal() {
+    if (!cf.hidden) return;
+    cf.hidden = false;
+    document.documentElement.classList.add('cf-open');
+    requestAnimationFrame(() => cf.classList.add('cf-in'));
+    cf.querySelector('.cf-x').focus();
+  }
+  function conceal() {
+    if (cf.hidden) return;
+    cf.classList.remove('cf-in');
+    document.documentElement.classList.remove('cf-open');
+    cf.hidden = true;
+    current = null;
+    if (opener) { opener.focus({ preventScroll: true }); opener = null; }
+  }
+
+  // The URL hash drives the overlay, so the phone's Back button closes it and links are shareable.
+  function sync() {
+    const m = location.hash.match(/^#case-([a-z0-9-]+)$/);
+    if (m && fill(m[1])) reveal(); else conceal();
+  }
+  function close() {
+    if (openedHere) { openedHere = false; history.back(); }
+    else { history.replaceState(null, '', location.pathname + location.search); conceal(); }
+  }
+
+  document.querySelectorAll('[data-open-case]').forEach((b) => b.addEventListener('click', () => {
+    opener = b; openedHere = true;
+    location.hash = `case-${b.dataset.openCase}`;
+  }));
+  cf.querySelectorAll('[data-cf-close]').forEach((el) => el.addEventListener('click', close));
+  ui.prev.addEventListener('click', () => show(idx - 1));
+  ui.next.addEventListener('click', () => show(idx + 1));
+  addEventListener('hashchange', () => { if (!/^#case-/.test(location.hash)) openedHere = false; sync(); });
+  addEventListener('keydown', (e) => {
+    if (cf.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowRight') show(idx + 1);
+    else if (e.key === 'ArrowLeft') show(idx - 1);
+    else if (e.key === 'Tab') {
+      // keep focus inside the dialog
+      const f = [...cf.querySelectorAll('button:not([hidden]), a[href]')].filter((el) => el.offsetParent !== null);
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  // swipe between photos on touch screens
+  let x0 = null;
+  ui.stage.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  ui.stage.addEventListener('touchend', (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+  });
+
+  sync();
+}
+
 function initUI() {
   initCounters();
   initTabs();
@@ -1163,6 +1322,7 @@ function initUI() {
   initLogLogos();
   initScope();
   initPinout();
+  initCaseFiles();
 }
 
 initUI();
