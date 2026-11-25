@@ -281,33 +281,27 @@
 
           <div class="sheet-head sheet-head--sub">
             <div><p class="mono sec-k"><b>§06</b>Pinout</p><h2 class="disp">Every skill points to where I used it</h2></div>
-            <span class="mono muted">Hover a project or a pin</span>
+            <span class="mono muted">Hover a project or a skill</span>
           </div>
           <div class="pinout" id="pinout">
-            <div class="pin-projects mono" role="group" aria-label="Highlight skills by project">
-              <button type="button" data-p="lamsoon">Lam Soon</button>
-              <button type="button" data-p="agro">AgroEzuran</button>
-              <button type="button" data-p="dapur">Dapur Kayu Mak</button>
-              <button type="button" data-p="rotee">ROTEE</button>
-              <button type="button" data-p="taska">Taska</button>
-              <button type="button" data-p="halfday">Halfday Cafe</button>
-              <button type="button" data-p="draft">Draft Detector</button>
-            </div>
-            <div class="pin-board">
-              <ul class="pins pins-l">
+            <div class="wire-board">
+              <svg class="wire-svg" aria-hidden="true"><g class="wire-base"></g><g class="wire-hot"></g></svg>
+              <div class="wire-projects mono" role="group" aria-label="Highlight skills by project">
+                <button type="button" data-p="lamsoon"><span>Lam Soon</span></button>
+                <button type="button" data-p="agro"><span>AgroEzuran</span></button>
+                <button type="button" data-p="dapur"><span>Dapur Kayu Mak</span></button>
+                <button type="button" data-p="rotee"><span>ROTEE</span></button>
+                <button type="button" data-p="taska"><span>Taska</span></button>
+                <button type="button" data-p="halfday"><span>Halfday Cafe</span></button>
+                <button type="button" data-p="draft"><span>Draft Detector</span></button>
+              </div>
+              <ul class="wire-skills">
                 <li data-p="lamsoon dapur rotee"><span class="pin-n mono">01</span><span class="pin-name">Next.js, React, TypeScript</span></li>
                 <li data-p="lamsoon dapur"><span class="pin-n mono">02</span><span class="pin-name">Supabase, PostgreSQL (RLS)</span></li>
                 <li data-p="lamsoon"><span class="pin-n mono">03</span><span class="pin-name">SSO, RBAC, MFA</span></li>
                 <li data-p="lamsoon dapur"><span class="pin-n mono">04</span><span class="pin-name">Cloudflare Workers</span></li>
                 <li data-p="lamsoon dapur"><span class="pin-n mono">05</span><span class="pin-name">Vitest, Playwright, pgTAP</span></li>
                 <li data-p="halfday"><span class="pin-n mono">06</span><span class="pin-name">PHP, MySQL</span></li>
-              </ul>
-              <div class="pin-chip" aria-hidden="true">
-                <span class="mono">KI-01</span>
-                <strong>Skills</strong>
-                <span class="mono">12-pin · Rev 2026</span>
-              </div>
-              <ul class="pins pins-r">
                 <li data-p="agro rotee taska"><span class="pin-n mono">07</span><span class="pin-name">Flutter, Dart</span></li>
                 <li data-p="agro rotee taska"><span class="pin-n mono">08</span><span class="pin-name">Firebase, Firestore</span></li>
                 <li data-p="agro taska"><span class="pin-n mono">09</span><span class="pin-name">ESP32, ESP32-CAM</span></li>

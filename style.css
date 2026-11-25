@@ -330,32 +330,39 @@ main, .bar, .foot { position: relative; z-index: 1; }
 .scope-read .scope-detail { color: var(--ink-2); margin: 10px 0 0; font-size: 15px; }
 .has-scope .log { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* skills: pinout */
+/* skills: wired board */
 .pinout { margin-top: 28px; }
-.pin-projects { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 30px; }
-.pin-projects button { font: inherit; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: transparent; color: var(--ink-2); border: 1px solid var(--line); padding: 7px 12px; cursor: pointer; min-height: 36px; transition: background .2s, color .2s, border-color .2s; }
-.pin-projects button:hover { color: var(--ink); border-color: var(--ink-3); }
-.pin-projects button.on { background: var(--signal); border-color: var(--signal); color: #111; }
-.pin-board { display: grid; grid-template-columns: minmax(0, 1fr) 230px minmax(0, 1fr); align-items: stretch; }
-.pins { list-style: none; margin: 0; padding: 22px 0; display: flex; flex-direction: column; justify-content: space-around; gap: 10px; }
-.pins li { display: flex; align-items: center; gap: 12px; transition: opacity .25s, color .25s; }
-.pins-l li { justify-content: flex-end; text-align: right; }
-.pins-l .pin-name { order: 1; }
-.pins-l .pin-n { order: 2; }
-.pins-l li::after, .pins-r li::before { content: ""; flex: none; width: 56px; height: 8px; border-radius: 1px; background: var(--gold); transition: background .25s, box-shadow .25s; }
-.pins-l li::after { order: 3; }
+.wire-board { position: relative; display: grid; grid-template-columns: 200px minmax(140px, 1fr) minmax(0, 310px); }
+.wire-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.wire-base path { fill: none; stroke: rgba(212,165,72,.2); stroke-width: 1.5; transition: opacity .3s; }
+.pinout.active .wire-base path { opacity: .45; }
+.wire-hot path { fill: none; stroke-linecap: round; }
+.w-glow { stroke: var(--signal); stroke-width: 2; stroke-dasharray: var(--len); stroke-dashoffset: var(--len); filter: drop-shadow(0 0 4px rgba(255,90,31,.85)); transition: stroke-dashoffset .5s cubic-bezier(.4,0,.2,1); }
+.w-flow { stroke: #ffe2cf; stroke-width: 2.5; stroke-dasharray: 2 26; opacity: 0; transition: opacity .2s; animation: wflow .8s linear infinite; }
+.wire-hot g.on .w-glow { stroke-dashoffset: 0; transition-duration: .75s; }
+.wire-hot g.on .w-flow { opacity: .95; transition: opacity .3s .6s; }
+@keyframes wflow { to { stroke-dashoffset: -28; } }
+.wire-projects { grid-column: 1; position: relative; display: flex; flex-direction: column; justify-content: space-around; gap: 10px; }
+.wire-projects button { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 46px; padding: 0 14px; font: inherit; font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; text-align: left; color: var(--ink-2); background: linear-gradient(160deg, #1a1b19, #0e0f0d); border: 1px solid #2a2c27; border-radius: 4px; cursor: pointer; transition: color .2s, border-color .2s, box-shadow .25s, opacity .25s; }
+.wire-projects button::after { content: ""; position: absolute; right: -6px; top: 50%; width: 6px; height: 8px; margin-top: -4px; background: var(--gold); border-radius: 0 1px 1px 0; transition: background .2s, box-shadow .2s; }
+.wire-projects .w-n { color: var(--ink-3); font-size: 10px; }
+.wire-projects button:hover { color: var(--ink); }
+.wire-projects button.on { color: var(--ink); border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 22px rgba(255,90,31,.22); }
+.wire-projects button.on::after { background: var(--signal); box-shadow: 0 0 10px var(--signal); }
+.wire-projects button.on .w-n { color: var(--signal); }
+.wire-skills { grid-column: 3; position: relative; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.wire-skills li { display: flex; align-items: center; gap: 12px; min-height: 38px; transition: opacity .25s; }
+.wire-skills li::before { content: ""; flex: none; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid var(--gold); background: var(--bg, #0b0c0a); box-sizing: border-box; transition: background .2s, border-color .2s, box-shadow .2s; }
+.wire-skills li.on::before { border-color: var(--signal); background: var(--signal); box-shadow: 0 0 12px var(--signal); }
 .pin-n { color: var(--ink-3); font-size: 10.5px; }
-.pin-name { font-size: 15.5px; color: var(--ink-2); }
-.pins li:hover .pin-name { color: var(--ink); }
-.pin-chip { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 380px; background: linear-gradient(160deg, #1a1b19, #0e0f0d); border: 1px solid #2a2c27; border-radius: 8px; box-shadow: inset 0 0 0 7px #0c0d0b, 0 22px 44px rgba(0,0,0,.5); }
-.pin-chip::before { content: ""; position: absolute; top: 18px; left: 18px; width: 10px; height: 10px; border-radius: 50%; background: #2c2e2a; }
-.pin-chip strong { font-family: var(--f-disp); font-stretch: 62%; font-weight: 800; font-size: 56px; text-transform: uppercase; line-height: .9; }
-.pin-chip .mono { color: var(--ink-3); }
-.pin-chip .mono:first-child { color: var(--gold); }
-.pinout.active .pins li { opacity: .28; }
-.pinout.active .pins li.on { opacity: 1; }
-.pinout.active .pins li.on .pin-name { color: var(--ink); }
-.pins li.on::after, .pins li.on::before { background: var(--signal); box-shadow: 0 0 12px var(--signal); }
+.pin-name { font-size: 15.5px; color: var(--ink-2); transition: color .2s; }
+.wire-skills li:hover .pin-name, .wire-skills li.on .pin-name { color: var(--ink); }
+.w-dots { margin-left: auto; display: flex; gap: 4px; padding-left: 10px; }
+.w-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); opacity: .45; transition: background .2s, opacity .2s; }
+.wire-skills li.on .w-dots i { background: var(--signal); opacity: 1; }
+.pinout.active .wire-skills li:not(.on) { opacity: .3; }
+.pinout.active .wire-projects button:not(.on) { opacity: .45; }
+@media (prefers-reduced-motion: reduce) { .w-flow { display: none; } .w-glow { transition: none; } }
 .pin-also { margin: 24px 0 0; color: var(--ink-2); font-size: 15px; text-align: center; }
 .pin-also .mono { color: var(--ink-3); margin-right: 10px; }
 .pin-also .pin-gap { margin-left: 22px; }
@@ -369,14 +376,13 @@ main, .bar, .foot { position: relative; z-index: 1; }
   .ics { grid-template-columns: minmax(0, 1fr); padding: 0 14px; }
   .scope { display: none; }
   .has-scope .log { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
-  .pin-board { grid-template-columns: minmax(0, 1fr); }
-  .pin-chip { min-height: 120px; order: -1; margin-bottom: 8px; }
-  .pins { padding: 8px 0; gap: 12px; }
-  .pins-l li { justify-content: flex-start; text-align: left; }
-  .pins-l .pin-name { order: 3; }
-  .pins-l .pin-n { order: 2; }
-  .pins-l li::after { order: 1; }
-  .pins-l li::after, .pins-r li::before { width: 22px; }
+  .wire-board { grid-template-columns: minmax(0, 1fr); }
+  .wire-svg { display: none; }
+  .wire-projects { flex-direction: row; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .wire-projects button { width: auto; min-height: 40px; }
+  .wire-projects button::after { display: none; }
+  .wire-skills { grid-column: 1; }
+  .wire-skills li::before { margin-left: 0; }
   .pin-also .pin-gap { display: block; margin: 12px 0 0; }
 }
 @media (prefers-reduced-motion: reduce) {

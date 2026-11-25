@@ -1130,30 +1130,92 @@ function initScope() {
   update();
 }
 
-// Skills: hover a project to light its pins, or a pin to light its projects.
+// Skills: projects on the left are wired to the skills they used, like traces on a board.
+// Hover a project to send current down its traces, or a skill to light every project that used it.
 function initPinout() {
   const box = document.getElementById('pinout');
   if (!box) return;
+  const board = box.querySelector('.wire-board');
+  const svg = box.querySelector('.wire-svg');
+  const baseL = svg.querySelector('.wire-base'), hotL = svg.querySelector('.wire-hot');
   const btns = [...box.querySelectorAll('button[data-p]')];
   const pins = [...box.querySelectorAll('li[data-p]')];
-  let locked = null, touched = false, demo = null;
+  const uses = (li, p) => li.dataset.p.split(' ').includes(p);
+  const NS = 'http://www.w3.org/2000/svg';
 
-  function showProject(p) {
-    box.classList.toggle('active', !!p);
-    pins.forEach((li) => li.classList.toggle('on', !!p && li.dataset.p.split(' ').includes(p)));
-    btns.forEach((b) => b.classList.toggle('on', b.dataset.p === p));
+  // how many projects used each skill, and how many skills each project used
+  pins.forEach((li) => {
+    const n = li.dataset.p.split(' ').length;
+    const d = document.createElement('span');
+    d.className = 'w-dots';
+    d.title = `Used in ${n} project${n > 1 ? 's' : ''}`;
+    d.innerHTML = '<i></i>'.repeat(n);
+    li.appendChild(d);
+  });
+  btns.forEach((b) => {
+    const s = document.createElement('span');
+    s.className = 'w-n';
+    s.textContent = String(pins.filter((li) => uses(li, b.dataset.p)).length).padStart(2, '0');
+    b.appendChild(s);
+  });
+
+  // a PCB-style trace: out of the chip, along the project's own lane, into the socket
+  function route(x1, y1, lx, x2, y2) {
+    if (Math.abs(y2 - y1) < 1) return `M${x1} ${y1} H${x2}`;
+    const s = y2 > y1 ? 1 : -1, r = Math.min(10, Math.abs(y2 - y1) / 2);
+    return `M${x1} ${y1} H${lx - r} Q${lx} ${y1} ${lx} ${y1 + s * r} V${y2 - s * r} Q${lx} ${y2} ${lx + r} ${y2} H${x2}`;
   }
-  function showSkill(li) {
-    const ps = li.dataset.p.split(' ');
-    box.classList.add('active');
-    pins.forEach((l) => l.classList.toggle('on', l === li));
-    btns.forEach((b) => b.classList.toggle('on', ps.includes(b.dataset.p)));
+  let wires = [];
+  function layout() {
+    if (getComputedStyle(svg).display === 'none') return;
+    const R = board.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`);
+    baseL.innerHTML = ''; hotL.innerHTML = ''; wires = [];
+    const x1 = btns[0].getBoundingClientRect().right - R.left;
+    const x2 = pins[0].getBoundingClientRect().left - R.left;
+    const lane = (x2 - x1) / (btns.length + 1);
+    btns.forEach((b, i) => {
+      const br = b.getBoundingClientRect();
+      const y1 = br.top + br.height / 2 - R.top;
+      const lx = x1 + lane * (i + 1);
+      pins.forEach((li) => {
+        if (!uses(li, b.dataset.p)) return;
+        const lr = li.getBoundingClientRect();
+        const d = route(x1, y1, lx, x2, lr.top + lr.height / 2 - R.top);
+        const base = document.createElementNS(NS, 'path');
+        base.setAttribute('d', d);
+        baseL.appendChild(base);
+        const g = document.createElementNS(NS, 'g');
+        for (const c of ['w-glow', 'w-flow']) {
+          const p = document.createElementNS(NS, 'path');
+          p.setAttribute('d', d); p.setAttribute('class', c);
+          g.appendChild(p);
+        }
+        hotL.appendChild(g);
+        g.style.setProperty('--len', g.firstChild.getTotalLength().toFixed(1));
+        wires.push({ p: b.dataset.p, li, g });
+      });
+    });
+    apply();
   }
+
+  let state = null, locked = null, touched = false, demo = null;
+  function apply() {
+    const s = state;
+    box.classList.toggle('active', !!s);
+    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.li === s.li)));
+    pins.forEach((li) => li.classList.toggle('on', !!s && (s.p ? uses(li, s.p) : li === s.li)));
+    btns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? b.dataset.p === s.p : uses(s.li, b.dataset.p))));
+  }
+  const showProject = (p) => { state = p ? { p } : null; apply(); };
+  const showSkill = (li) => { state = { li }; apply(); };
   const stopDemo = () => { touched = true; clearInterval(demo); };
+
   btns.forEach((b) => {
     b.addEventListener('mouseenter', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('focus', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('mouseleave', () => showProject(locked));
+    b.addEventListener('blur', () => showProject(locked));
     b.addEventListener('click', () => { stopDemo(); locked = locked === b.dataset.p ? null : b.dataset.p; showProject(locked); });
   });
   pins.forEach((li) => {
@@ -1161,15 +1223,18 @@ function initPinout() {
     li.addEventListener('mouseleave', () => showProject(locked));
   });
 
-  // Until someone interacts, cycle through the projects once it scrolls into view.
+  new ResizeObserver(layout).observe(board);
+  document.fonts && document.fonts.ready.then(layout);
+  layout();
+
+  // Until someone interacts, wire up each project in turn once the board scrolls into view.
   if (!REDUCE) onVisible(box, () => {
     let i = 0;
     demo = setInterval(() => {
       if (touched) return clearInterval(demo);
-      showProject(btns[i % btns.length].dataset.p);
-      i++;
-      if (i > btns.length) { clearInterval(demo); showProject(null); }
-    }, 1400);
+      if (i >= btns.length) { clearInterval(demo); showProject(null); return; }
+      showProject(btns[i++].dataset.p);
+    }, 1600);
   }, 0.4);
 }
 
