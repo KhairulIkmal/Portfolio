@@ -1130,82 +1130,86 @@ function initScope() {
   update();
 }
 
-// Skills: projects on the left are wired to the skills they used, like traces on a board.
-// Hover a project to send current down its traces, or a skill to light every project that used it.
+// Skills: hover a project to light its pins, or a pin to light its projects.
+// When a project lights up, traces run from its button down the side of the board into each pin it used.
 function initPinout() {
   const box = document.getElementById('pinout');
   if (!box) return;
-  const board = box.querySelector('.wire-board');
-  const svg = box.querySelector('.wire-svg');
-  const baseL = svg.querySelector('.wire-base'), hotL = svg.querySelector('.wire-hot');
   const btns = [...box.querySelectorAll('button[data-p]')];
   const pins = [...box.querySelectorAll('li[data-p]')];
   const uses = (li, p) => li.dataset.p.split(' ').includes(p);
+  const svg = box.querySelector('.pin-wires');
+  const baseL = svg && svg.querySelector('.wire-base'), hotL = svg && svg.querySelector('.wire-hot');
   const NS = 'http://www.w3.org/2000/svg';
-
-  // how many projects used each skill, and how many skills each project used
-  pins.forEach((li) => {
-    const n = li.dataset.p.split(' ').length;
-    const d = document.createElement('span');
-    d.className = 'w-dots';
-    d.title = `Used in ${n} project${n > 1 ? 's' : ''}`;
-    d.innerHTML = '<i></i>'.repeat(n);
-    li.appendChild(d);
-  });
-  btns.forEach((b) => {
-    const s = document.createElement('span');
-    s.className = 'w-n';
-    s.textContent = String(pins.filter((li) => uses(li, b.dataset.p)).length).padStart(2, '0');
-    b.appendChild(s);
-  });
-
-  // a PCB-style trace: out of the chip, along the project's own lane, into the socket
-  function route(x1, y1, lx, x2, y2) {
-    if (Math.abs(y2 - y1) < 1) return `M${x1} ${y1} H${x2}`;
-    const s = y2 > y1 ? 1 : -1, r = Math.min(10, Math.abs(y2 - y1) / 2);
-    return `M${x1} ${y1} H${lx - r} Q${lx} ${y1} ${lx} ${y1 + s * r} V${y2 - s * r} Q${lx} ${y2} ${lx + r} ${y2} H${x2}`;
-  }
   let wires = [];
+  let state = null, locked = null, touched = false, demo = null;
+
+  // a polyline with rounded corners, like a routed PCB trace
+  function trace(pts, r = 8) {
+    let d = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let k = 1; k < pts.length - 1; k++) {
+      const [px, py] = pts[k - 1], [x, y] = pts[k], [nx, ny] = pts[k + 1];
+      const a = Math.min(r, Math.hypot(x - px, y - py) / 2), b = Math.min(r, Math.hypot(nx - x, ny - y) / 2);
+      const ux = Math.sign(x - px), uy = Math.sign(y - py), vx = Math.sign(nx - x), vy = Math.sign(ny - y);
+      d += ` L${x - ux * a} ${y - uy * a} Q${x} ${y} ${x + vx * b} ${y + vy * b}`;
+    }
+    const [lx, ly] = pts[pts.length - 1];
+    return d + ` L${lx} ${ly}`;
+  }
+
   function layout() {
-    if (getComputedStyle(svg).display === 'none') return;
-    const R = board.getBoundingClientRect();
-    svg.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`);
+    if (!svg) return;
     baseL.innerHTML = ''; hotL.innerHTML = ''; wires = [];
-    const x1 = btns[0].getBoundingClientRect().right - R.left;
-    const x2 = pins[0].getBoundingClientRect().left - R.left;
-    const lane = (x2 - x1) / (btns.length + 1);
+    if (getComputedStyle(svg).display === 'none') return;
+    const R = box.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`);
+    const rel = (r) => ({ l: r.left - R.left, r: r.right - R.left, t: r.top - R.top, b: r.bottom - R.top });
+    const boardTop = rel(box.querySelector('.pin-board').getBoundingClientRect()).t;
+    const GAP = 11, EDGE = 6;
+    // skip the traces when the side lanes would run into the pin names (narrow laptops)
+    const names = pins.map((li) => rel(li.querySelector('.pin-name').getBoundingClientRect()));
+    const leftRoom = Math.min(...names.filter((_, k) => li(k).closest('.pins-l')).map((n) => n.l));
+    const rightRoom = R.width - Math.max(...names.filter((_, k) => li(k).closest('.pins-r')).map((n) => n.r));
+    function li(k) { return pins[k]; }
+    if (Math.min(leftRoom, rightRoom) < EDGE + GAP * btns.length + 14) { svg.classList.add('off'); return; }
+    svg.classList.remove('off');
+
     btns.forEach((b, i) => {
-      const br = b.getBoundingClientRect();
-      const y1 = br.top + br.height / 2 - R.top;
-      const lx = x1 + lane * (i + 1);
-      pins.forEach((li) => {
-        if (!uses(li, b.dataset.p)) return;
-        const lr = li.getBoundingClientRect();
-        const d = route(x1, y1, lx, x2, lr.top + lr.height / 2 - R.top);
+      const br = rel(b.getBoundingClientRect());
+      const bx = (br.l + br.r) / 2, yb = boardTop - 8 - i * 2.6;
+      pins.forEach((p, k) => {
+        if (!uses(p, b.dataset.p)) return;
+        const n = names[k], py = (n.t + n.b) / 2;
+        const left = !!p.closest('.pins-l');
+        const lx = left ? EDGE + i * GAP : R.width - EDGE - i * GAP;
+        const ex = left ? n.l - 10 : n.r + 10;
+        const d = trace([[bx, br.b], [bx, yb], [lx, yb], [lx, py], [ex, py]]);
         const base = document.createElementNS(NS, 'path');
         base.setAttribute('d', d);
         baseL.appendChild(base);
         const g = document.createElementNS(NS, 'g');
-        for (const c of ['w-glow', 'w-flow']) {
-          const p = document.createElementNS(NS, 'path');
-          p.setAttribute('d', d); p.setAttribute('class', c);
-          g.appendChild(p);
+        for (const cls of ['w-glow', 'w-flow']) {
+          const path = document.createElementNS(NS, 'path');
+          path.setAttribute('d', d); path.setAttribute('class', cls);
+          g.appendChild(path);
         }
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', ex); dot.setAttribute('cy', py); dot.setAttribute('r', 3.5);
+        g.appendChild(dot);
         hotL.appendChild(g);
         g.style.setProperty('--len', g.firstChild.getTotalLength().toFixed(1));
-        wires.push({ p: b.dataset.p, li, g });
+        wires.push({ p: b.dataset.p, li: p, g });
       });
     });
     apply();
   }
 
-  let state = null, locked = null, touched = false, demo = null;
   function apply() {
     const s = state;
     box.classList.toggle('active', !!s);
-    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.li === s.li)));
-    pins.forEach((li) => li.classList.toggle('on', !!s && (s.p ? uses(li, s.p) : li === s.li)));
+    pins.forEach((p) => p.classList.toggle('on', !!s && (s.p ? uses(p, s.p) : p === s.li)));
     btns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? b.dataset.p === s.p : uses(s.li, b.dataset.p))));
+    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.li === s.li)));
   }
   const showProject = (p) => { state = p ? { p } : null; apply(); };
   const showSkill = (li) => { state = { li }; apply(); };
@@ -1215,19 +1219,20 @@ function initPinout() {
     b.addEventListener('mouseenter', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('focus', () => { stopDemo(); showProject(b.dataset.p); });
     b.addEventListener('mouseleave', () => showProject(locked));
-    b.addEventListener('blur', () => showProject(locked));
     b.addEventListener('click', () => { stopDemo(); locked = locked === b.dataset.p ? null : b.dataset.p; showProject(locked); });
   });
-  pins.forEach((li) => {
-    li.addEventListener('mouseenter', () => { stopDemo(); showSkill(li); });
-    li.addEventListener('mouseleave', () => showProject(locked));
+  pins.forEach((p) => {
+    p.addEventListener('mouseenter', () => { stopDemo(); showSkill(p); });
+    p.addEventListener('mouseleave', () => showProject(locked));
   });
 
-  new ResizeObserver(layout).observe(board);
-  document.fonts && document.fonts.ready.then(layout);
-  layout();
+  if (svg) {
+    new ResizeObserver(layout).observe(box);
+    document.fonts && document.fonts.ready.then(layout);
+    layout();
+  }
 
-  // Until someone interacts, wire up each project in turn once the board scrolls into view.
+  // Until someone interacts, cycle through the projects once it scrolls into view.
   if (!REDUCE) onVisible(box, () => {
     let i = 0;
     demo = setInterval(() => {
