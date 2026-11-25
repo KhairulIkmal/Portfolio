@@ -424,6 +424,9 @@ main, .bar, .foot { position: relative; z-index: 1; }
 .cf-nophotos .cf-stage, .cf-nophotos .cf-cap, .cf-nophotos .cf-thumbs { display: none; }
 .cf-nophotos .cf-body { grid-template-columns: minmax(0, 1fr); }
 .cf-nophotos .cf-gallery { display: none; }
+@media (min-width: 861px) {
+  html:not(.draft) .cf-nophotos .cf-panel { width: min(860px, 100%); height: auto; max-height: 100%; }
+}
 .draft .cf-nophotos .cf-gallery { display: grid; place-items: center; border: 1px dashed var(--ink-3); margin: 18px; }
 .draft .cf-nophotos .cf-body { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); }
 .cf-loading .cf-stage::after { content: "Loading photos…"; position: absolute; color: var(--ink-3); font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
