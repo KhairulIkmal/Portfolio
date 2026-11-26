@@ -30,7 +30,7 @@ const CALLOUTS = [
   { id: 'die',    tag: 'U1 · Core',           text: 'Next.js, TypeScript, Supabase / PostgreSQL, Cloudflare Workers.' },
   { id: 'ant',    tag: 'ANT1 · Range',        text: 'Gold, RISE 2026 · Gold, DINS 2025 · Top 20, PutraHack 2026.' },
   { id: 'led',    tag: 'D1 · Status',         text: 'Interning until Jan 2027. Looking for a junior software engineer role.' },
-  { id: 'header', tag: 'J1 · Education',      text: 'B.CS Software Engineering, UTHM, CGPA 3.74. Matriculation CGPA 3.98.' },
+  { id: 'header', tag: 'J1 · Education',      text: 'B.CS Software Engineering, UTHM, CGPA 3.72. Matriculation CGPA 3.98.' },
   { id: 'sw',     tag: 'SW1 · Input',         text: 'Facilitator + treasurer, TechUp IoT workshop. 30+ participants.' },
   { id: 'usb',    tag: 'USB1 · Port',         text: 'ikmal03411@gmail.com · willing to relocate' },
 ];
@@ -206,7 +206,7 @@ function shieldTexture() {
   g.fillText('KI-32', 40, 140);
   g.font = '500 26px "IBM Plex Mono", monospace';
   g.fillText('SOFTWARE ENGINEER', 42, 200);
-  g.fillText('B.CS · UTHM · 3.74', 42, 244);
+  g.fillText('B.CS · UTHM · 3.72', 42, 244);
   g.font = '500 20px "IBM Plex Mono", monospace';
   g.fillText('FULL-STACK / MOBILE / IOT', 42, 400);
   g.fillText('LOT 2026.11', 42, 432);
