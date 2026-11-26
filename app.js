@@ -1131,7 +1131,7 @@ function initScope() {
 }
 
 // §06 Stack: every tool sits on a globe that spins, clustered by capability. Pick a project or a capability and
-// the globe turns to face those tools, lights them and routes packets between them. Certificates orbit as satellites.
+// the globe turns to face those tools, lights them and routes packets between them.
 const DEVICON = 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/';
 // [name, devicon path ('' = text badge), capabilities, projects, 'inv' for dark logos]
 const TOOLS = [
@@ -1183,7 +1183,6 @@ function initGlobe() {
   const cv = stage.querySelector('canvas'), ctx = cv.getContext('2d');
   const rk = box.querySelector('.gr-k'), rt = box.querySelector('.gr-t'), rd = box.querySelector('.gr-d');
   const pBtns = [...box.querySelectorAll('button[data-p]')], cBtns = [...box.querySelectorAll('button[data-cap]')];
-  const certLis = [...document.querySelectorAll('.cert-list li')];
   const capName = Object.fromEntries(cBtns.map((b) => [b.dataset.cap, b.querySelector('span').textContent]));
   const projName = Object.fromEntries(pBtns.map((b) => [b.dataset.p, b.textContent]));
   const TAU = Math.PI * 2;
@@ -1217,23 +1216,6 @@ function initGlobe() {
     });
   }
 
-  // ---- certificates: satellites on a tilted ring ----
-  const sats = certLis.map((li, i) => {
-    const el = document.createElement('span');
-    el.className = 'gsat';
-    el.innerHTML = `<span class="gsat-logo"><img src="${li.dataset.logo}" alt="" draggable="false"${li.dataset.crop ? ' class="crop-top"' : ''}></span>${li.dataset.i}`;
-    el.setAttribute('aria-hidden', 'true');
-    stage.appendChild(el);
-    return { li, el, a: (i / certLis.length) * TAU, back: null };
-  });
-  const RING_T = 0.32, RING_Z = -0.38;
-  function ringPoint(a, r) {
-    // circle in the x-z plane, tipped about x, then turned about the view axis
-    const x = Math.cos(a) * r, z0 = Math.sin(a) * r;
-    const y = -z0 * Math.sin(RING_T), z = z0 * Math.cos(RING_T);
-    return [x * Math.cos(RING_Z) - y * Math.sin(RING_Z), x * Math.sin(RING_Z) + y * Math.cos(RING_Z), z];
-  }
-
   // ---- view ----
   let rotX = 0.32, rotY = 0.6, vX = 0, vY = 0, tgt = null;
   let S = 600, R = 200, C = 300, dpr = 1;
@@ -1253,13 +1235,13 @@ function initGlobe() {
   }
   function resize() {
     S = stage.clientWidth; dpr = Math.min(2, devicePixelRatio || 1);
-    R = S * (S < 480 ? 0.335 : 0.33); C = S / 2;
+    R = S * 0.36; C = S / 2;
     cv.width = Math.round(S * dpr); cv.height = Math.round(S * dpr);
   }
 
   // ---- state ----
   let state = null, locked = null, selAt = 0, chain = [], touched = false, demo = null;
-  const same = (a, b) => !!a && !!b && a.p === b.p && a.cap === b.cap && a.tool === b.tool && a.cert === b.cert;
+  const same = (a, b) => !!a && !!b && a.p === b.p && a.cap === b.cap && a.tool === b.tool;
   function lit(nd, s) {
     if (!s) return false;
     if (s.p) return nd.p.includes(s.p);
@@ -1270,7 +1252,7 @@ function initGlobe() {
   function readout(s) {
     if (!s) {
       rk.textContent = 'KI-01 · Parts list';
-      rt.textContent = `${nodes.length} parts · ${cBtns.length} capabilities · ${sats.length} certificates`;
+      rt.textContent = `${nodes.length} parts · ${cBtns.length} capabilities`;
       rd.textContent = 'Drag the globe to spin it. Pick a project to see what it was built with, or a capability to see the tools behind it.';
     } else if (s.p) {
       const on = nodes.filter((n) => lit(n, s));
@@ -1285,9 +1267,6 @@ function initGlobe() {
       const t = s.tool;
       rk.textContent = t.cap.length ? capName[t.cap[0]] : 'Toolkit'; rt.textContent = t.name;
       rd.innerHTML = t.p.length ? `<span class="mono">Used in</span>${list(t.p.map((p) => projName[p]))}` : 'Part of my everyday toolkit.';
-    } else if (s.cert) {
-      rk.textContent = 'Certificate · ' + s.cert.li.dataset.i; rt.textContent = s.cert.li.lastChild.textContent.trim();
-      rd.textContent = 'One of the satellites in orbit around the globe.';
     }
   }
   function set(s) {
@@ -1309,7 +1288,6 @@ function initGlobe() {
     nodes.forEach((n) => n.el.classList.toggle('on', on.includes(n)));
     pBtns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? s.p === b.dataset.p : on.some((n) => n.p.includes(b.dataset.p)))));
     cBtns.forEach((b) => b.classList.toggle('on', !!s && (s.cap ? s.cap === b.dataset.cap : on.some((n) => n.cap.includes(b.dataset.cap)))));
-    sats.forEach((t) => { const hit = !!s && s.cert === t; t.el.classList.toggle('on', hit); t.li.classList.toggle('on', hit); });
     // turn to face the lit tools, but not when hovering a single tool (it would slide out from under the cursor)
     tgt = on.length && !(s && s.tool) ? faceOf(on.map((n) => n.v)) : null;
     if (REDUCE && tgt) { rotX = tgt.x; rotY = tgt.y; }
@@ -1338,12 +1316,6 @@ function initGlobe() {
     n.el.addEventListener('mouseenter', () => { if (!drag) { stopDemo(); set({ tool: n }); } });
     n.el.addEventListener('mouseleave', () => { if (!drag) release(); });
   });
-  sats.forEach((t) => {
-    t.el.addEventListener('mouseenter', () => { if (!drag) { stopDemo(); set({ cert: t }); } });
-    t.el.addEventListener('mouseleave', () => { if (!drag) release(); });
-    t.li.addEventListener('mouseenter', () => { stopDemo(); set({ cert: t }); });
-    t.li.addEventListener('mouseleave', release);
-  });
 
   // ---- drag to spin (touch: sideways spins, up and down still scrolls the page) ----
   let drag = null;
@@ -1370,9 +1342,8 @@ function initGlobe() {
     const tap = drag.moved <= 5, t = drag.target;
     drag = null; stage.classList.remove('grab');
     if (!tap || !e || e.type !== 'pointerup') return;
-    const n = nodes.find((nd) => nd.el.contains(t)), st = sats.find((s) => s.el.contains(t));
+    const n = nodes.find((nd) => nd.el.contains(t));
     if (n) toggleLock({ tool: n });
-    else if (st) toggleLock({ cert: st });
     else if (locked) { locked = null; set(null); }
   }
   stage.addEventListener('pointerup', endDrag);
@@ -1396,11 +1367,6 @@ function initGlobe() {
     const g = ctx.createRadialGradient(C, C, R * 0.2, C, C, R * 1.6);
     g.addColorStop(0, 'rgba(255,90,31,.10)'); g.addColorStop(0.55, 'rgba(212,165,72,.035)'); g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
-    // orbit ring, back half first
-    const ringF = new Path2D(), ringB = new Path2D(), ring = [];
-    for (let a = 0; a <= TAU + 0.001; a += TAU / 120) { const p = ringPoint(a, 1.38 * R); ring.push([C + p[0], C + p[1], p[2]]); }
-    strokeSplit(ring, ringF, ringB);
-    ctx.lineWidth = 1; ctx.strokeStyle = `rgba(212,165,72,${0.16 * k0})`; ctx.stroke(ringB);
     ctx.beginPath(); ctx.arc(C, C, R, 0, TAU); ctx.fillStyle = `rgba(7,9,7,${0.78 * k0})`; ctx.fill();
     // graticule
     const gf = new Path2D(), gb = new Path2D(), Rk = R * (0.6 + 0.4 * k0);
@@ -1450,7 +1416,6 @@ function initGlobe() {
       heads.forEach(([x, y, z]) => { ctx.beginPath(); ctx.arc(x, y, 2.8, 0, TAU); ctx.fillStyle = z > 0 ? '#fff1e6' : 'rgba(255,200,170,.35)'; ctx.fill(); });
       ctx.restore();
     }
-    ctx.lineWidth = 1; ctx.strokeStyle = `rgba(212,165,72,${0.34 * k0})`; ctx.stroke(ringF);
 
     // tools
     const any = !!state;
@@ -1466,19 +1431,6 @@ function initGlobe() {
       const face = z > 0.45, back = z < -0.1;
       if (face !== n.face) { n.face = face; n.el.classList.toggle('face', face); }
       if (back !== n.back) { n.back = back; n.el.classList.toggle('back', back); }
-    });
-    // satellites
-    sats.forEach((t) => {
-      const a = t.a + (REDUCE ? 0 : now * 0.00011);
-      const [x, y, z] = ringPoint(a, 1.38 * R), d = z / (1.38 * R);
-      const hidden = z < 0 && Math.hypot(x, y) < R;
-      let op = (hidden ? 0.18 : 0.55 + 0.45 * Math.max(0, d)) * k0;
-      if (any && !t.el.classList.contains('on')) op *= 0.5;
-      t.el.style.transform = `translate(${(C + x).toFixed(1)}px,${(C + y).toFixed(1)}px) translate(-50%,-50%) scale(${(0.82 + 0.18 * (d + 1) / 2).toFixed(3)})`;
-      t.el.style.opacity = op.toFixed(3);
-      t.el.style.zIndex = String(z < 0 ? 0 : 120);
-      const back = hidden;
-      if (back !== t.back) { t.back = back; t.el.classList.toggle('back', back); }
     });
   }
   function tick(now) {
@@ -1519,6 +1471,21 @@ function initGlobe() {
       set({ p: pBtns[i++].dataset.p });
     }, 2800);
   }, 0.45);
+}
+
+// Certificates on a tape: the pockets are copied once so the tape can loop without a seam.
+function initReel() {
+  const track = document.querySelector('.tape-track');
+  if (!track) return;
+  [...track.children].forEach((li) => {
+    const copy = li.cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    copy.querySelector('img').alt = '';
+    track.appendChild(copy);
+  });
+  const speed = () => track.style.setProperty('--dur', (track.scrollWidth / 2 / 38).toFixed(1) + 's');
+  speed();
+  addEventListener('resize', speed);
 }
 
 // Case files: a full-screen overlay per project with a photo gallery and the full story.
@@ -1687,6 +1654,7 @@ function initUI() {
   initLogLogos();
   initScope();
   initGlobe();
+  initReel();
   initCaseFiles();
 }
 

@@ -285,7 +285,7 @@
               <span class="mono muted">Drag to spin · pick a project or a capability</span>
             </div>
             <div class="globe-grid">
-              <div class="globe-stage" role="img" aria-label="A spinning globe of the tools I use, with my certificates in orbit">
+              <div class="globe-stage" role="img" aria-label="A spinning globe of the tools I use">
                 <canvas aria-hidden="true"></canvas>
               </div>
               <div class="globe-side">
@@ -319,19 +319,27 @@
             </div>
             <p class="globe-sr">Tools: ESP32, TensorFlow Lite, MobileNetV2, NFC, Roboflow, object detection, REST APIs, Cloudflare Workers, Cloud Functions, PostgreSQL, Supabase, MySQL, Microsoft SQL Server, SSO, RBAC, MFA, Row-Level Security, Next.js, React, TypeScript, JavaScript, PHP, HTML/CSS, Tailwind CSS, Firebase, Firebase Cloud Messaging, Flutter, Dart, JavaFX, Java, Vitest, Playwright, pgTAP, React Testing Library, Node.js, Python, C++, Git, GitHub, Docker, OpenAI API.</p>
           </div>
-          <div class="certs">
-            <p class="mono bom-h"><b>CERT</b>Certificates in orbit</p>
-            <ul class="cert-list">
-              <li data-i="UTHM" data-logo="assets/logos/uthm.png" data-crop="top"><span class="plate plate-xs"><img src="assets/logos/uthm.png" alt="" class="crop-top" loading="lazy"></span><span class="mono">UTHM</span>Dean's List Student</li>
-              <li data-i="Cisco" data-logo="assets/logos/certs/cisco.svg"><span class="plate plate-xs"><img src="assets/logos/certs/cisco.svg" alt="" loading="lazy"></span><span class="mono">Cisco</span>CCNA: Introduction to Networks</li>
-              <li data-i="AWS" data-logo="assets/logos/certs/aws.svg"><span class="plate plate-xs"><img src="assets/logos/certs/aws.svg" alt="" loading="lazy"></span><span class="mono">AWS</span>AWS Academy Workshop</li>
-              <li data-i="SAS" data-logo="assets/logos/certs/sas.svg"><span class="plate plate-xs"><img src="assets/logos/certs/sas.svg" alt="" loading="lazy"></span><span class="mono">SAS</span>Machine Learning Using SAS Viya</li>
-              <li data-i="SAS" data-logo="assets/logos/certs/sas.svg"><span class="plate plate-xs"><img src="assets/logos/certs/sas.svg" alt="" loading="lazy"></span><span class="mono">SAS</span>SAS Viya Overview</li>
-              <li data-i="Google" data-logo="assets/logos/certs/google.svg"><span class="plate plate-xs"><img src="assets/logos/certs/google.svg" alt="" loading="lazy"></span><span class="mono">Google</span>Gemini Certified University Student</li>
-              <li data-i="HPE Aruba" data-logo="assets/logos/certs/aruba.svg"><span class="plate plate-xs"><img src="assets/logos/certs/aruba.svg" alt="" loading="lazy"></span><span class="mono">HPE Aruba</span>Aruba Instant AP (IAP) Configuration</li>
-              <li data-i="SAS" data-logo="assets/logos/certs/sas.svg"><span class="plate plate-xs"><img src="assets/logos/certs/sas.svg" alt="" loading="lazy"></span><span class="mono">SAS</span>Data Literacy in Practice</li>
-              <li data-i="SAS" data-logo="assets/logos/certs/sas.svg"><span class="plate plate-xs"><img src="assets/logos/certs/sas.svg" alt="" loading="lazy"></span><span class="mono">SAS</span>Data Literacy Essentials</li>
-            </ul>
+          <div class="reel" id="reel">
+            <div class="reel-head">
+              <p class="mono bom-h"><b>CERT</b>Certificates, fed off the reel</p>
+              <span class="mono muted reel-hint">Hover to stop the tape</span>
+            </div>
+            <div class="reel-body">
+              <div class="reel-spool" aria-hidden="true"><div class="spool-disc"></div><span class="mono">KI-CERT<b>9 pcs</b></span></div>
+              <div class="tape">
+                <ul class="tape-track" aria-label="Certificates">
+                  <li class="pocket"><span class="pk-no mono">C-01</span><span class="pk-logo"><img src="assets/logos/uthm.png" alt="UTHM logo" class="crop-top" loading="lazy" draggable="false"></span><strong>Dean's List Student</strong><span class="pk-by mono">UTHM</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-02</span><span class="pk-logo"><img src="assets/logos/certs/cisco.svg" alt="Cisco logo" loading="lazy" draggable="false"></span><strong>CCNA: Introduction to Networks</strong><span class="pk-by mono">Cisco</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-03</span><span class="pk-logo"><img src="assets/logos/certs/aws.svg" alt="AWS logo" loading="lazy" draggable="false"></span><strong>AWS Academy Workshop</strong><span class="pk-by mono">AWS</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-04</span><span class="pk-logo"><img src="assets/logos/certs/sas.svg" alt="SAS logo" loading="lazy" draggable="false"></span><strong>Machine Learning Using SAS Viya</strong><span class="pk-by mono">SAS</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-05</span><span class="pk-logo"><img src="assets/logos/certs/sas.svg" alt="SAS logo" loading="lazy" draggable="false"></span><strong>SAS Viya Overview</strong><span class="pk-by mono">SAS</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-06</span><span class="pk-logo"><img src="assets/logos/certs/google.svg" alt="Google logo" loading="lazy" draggable="false"></span><strong>Gemini Certified University Student</strong><span class="pk-by mono">Google</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-07</span><span class="pk-logo"><img src="assets/logos/certs/aruba.svg" alt="HPE Aruba logo" loading="lazy" draggable="false"></span><strong>Aruba Instant AP (IAP) Configuration</strong><span class="pk-by mono">HPE Aruba</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-08</span><span class="pk-logo"><img src="assets/logos/certs/sas.svg" alt="SAS logo" loading="lazy" draggable="false"></span><strong>Data Literacy in Practice</strong><span class="pk-by mono">SAS</span></li>
+                  <li class="pocket"><span class="pk-no mono">C-09</span><span class="pk-logo"><img src="assets/logos/certs/sas.svg" alt="SAS logo" loading="lazy" draggable="false"></span><strong>Data Literacy Essentials</strong><span class="pk-by mono">SAS</span></li>
+                </ul>
+              </div>
+            </div>
             <p class="pin-also"><span class="mono">Languages</span> Malay (native) · English (proficient)</p>
           </div>
         </div>
