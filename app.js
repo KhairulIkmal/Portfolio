@@ -1135,22 +1135,22 @@ function initScope() {
 const DEVICON = 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/';
 // [name, devicon path ('' = text badge), capabilities, projects, 'inv' for dark logos]
 const TOOLS = [
-  ['ESP32', '', 'iot', 'agro taska'],
+  ['ESP32', 'assets/logos/tools/espressif.svg', 'iot', 'agro taska'],
   ['TensorFlow Lite', 'tensorflow/tensorflow-original', 'ml', 'agro'],
   ['MobileNetV2', '', 'ml', 'agro'],
-  ['NFC', '', 'nfc', 'taska'],
-  ['Roboflow', '', 'cv', 'draft'],
+  ['NFC', 'assets/logos/tools/nfc.svg', 'nfc', 'taska'],
+  ['Roboflow', 'assets/logos/tools/roboflow.svg', 'cv', 'draft'],
   ['Object detection', '', 'cv', 'draft'],
   ['REST APIs', '', 'api', 'lamsoon agro'],
   ['Cloudflare Workers', 'cloudflareworkers/cloudflareworkers-original', 'fn', 'lamsoon dapur'],
-  ['Cloud Functions', '', 'fn', 'rotee'],
+  ['Cloud Functions', 'googlecloud/googlecloud-original', 'fn', 'rotee'],
   ['PostgreSQL', 'postgresql/postgresql-original', 'db', 'lamsoon dapur'],
   ['Supabase', 'supabase/supabase-original', 'db', 'lamsoon dapur'],
   ['MySQL', 'mysql/mysql-original', 'db', 'halfday'],
   ['SQL Server', 'microsoftsqlserver/microsoftsqlserver-original', 'db', ''],
   ['SSO · RBAC · MFA', '', 'auth', 'lamsoon'],
   ['Row-Level Security', '', 'auth', 'lamsoon'],
-  ['Next.js', 'nextjs/nextjs-original', 'web', 'lamsoon dapur', 'inv'],
+  ['Next.js', 'nextjs/nextjs-original', 'web', 'lamsoon dapur draft', 'inv'],
   ['React', 'react/react-original', 'web', 'lamsoon dapur rotee'],
   ['TypeScript', 'typescript/typescript-original', 'web', 'lamsoon dapur'],
   ['JavaScript', 'javascript/javascript-original', 'web', 'halfday'],
@@ -1166,14 +1166,14 @@ const TOOLS = [
   ['Vitest', 'vitest/vitest-original', 'test', 'lamsoon dapur'],
   ['Playwright', 'playwright/playwright-original', 'test', 'lamsoon dapur'],
   ['pgTAP', '', 'test', ''],
-  ['Testing Library', '', 'test', ''],
+  ['Testing Library', 'assets/logos/tools/testinglibrary.svg', 'test', ''],
   ['Node.js', 'nodejs/nodejs-original', '', ''],
   ['Python', 'python/python-original', '', ''],
   ['C++', 'cplusplus/cplusplus-original', '', ''],
   ['Git', 'git/git-original', '', ''],
   ['GitHub', 'github/github-original', '', '', 'inv'],
   ['Docker', 'docker/docker-original', '', ''],
-  ['OpenAI API', '', '', ''],
+  ['OpenAI API', 'assets/logos/tools/openai.svg', '', ''],
 ];
 
 function initGlobe() {
@@ -1195,7 +1195,7 @@ function initGlobe() {
   const nodes = TOOLS.map(([name, icon, cap, p, flag], i) => {
     const el = document.createElement('span');
     el.className = 'gn' + (icon ? '' : ' gn-t');
-    el.innerHTML = icon ? `<img src="${DEVICON}${icon}.svg" alt="" draggable="false" decoding="async"${flag === 'inv' ? ' class="inv"' : ''}><i>${name}</i>` : `<b>${name}</b>`;
+    el.innerHTML = icon ? `<img src="${icon.startsWith('assets/') ? icon : DEVICON + icon + '.svg'}" alt="" draggable="false" decoding="async"${flag === 'inv' ? ' class="inv"' : ''}><i>${name}</i>` : `<b>${name}</b>`;
     el.setAttribute('aria-hidden', 'true');
     stage.appendChild(el);
     const g = groups.indexOf(cap || '-'), c = centres[g], j = fib(i, TOOLS.length);
