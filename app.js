@@ -1130,260 +1130,395 @@ function initScope() {
   update();
 }
 
-// §06 Stack: four boards (device, cloud, apps, quality) start stacked and tilted. Scrolling pulls them apart,
-// drops a data packet from the sensor down to a phone screen, then lays the boards flat. Once flat,
-// hovering a project wires it to every skill it used, and hovering a skill wires it back to its projects.
-function initStack() {
-  const box = document.getElementById('stack');
-  if (!box) return;
-  const pin = box.querySelector('.stack-pin');
-  const stage = box.querySelector('.stack-stage');
-  const scene = box.querySelector('.stack-scene');
-  const layers = [...box.querySelectorAll('.layer')];
-  const cover = box.querySelector('.layer-cover');
-  const cap = box.querySelector('.stack-cap');
-  const screenEl = box.querySelector('.sk-screen');
-  const btns = [...box.querySelectorAll('.stack-projects button[data-p]')];
-  const chips = [...box.querySelectorAll('.sk[data-p]')];
-  const svg = box.querySelector('.stack-wires'), hotL = svg.querySelector('.wire-hot');
-  const uses = (el, p) => el.dataset.p.split(' ').includes(p);
-  const span = (p, a, b) => clamp01((p - a) / (b - a));
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const NS = 'http://www.w3.org/2000/svg';
-  const small = matchMedia('(max-width: 860px)');
+// §06 Stack: every tool sits on a globe that spins, clustered by capability. Pick a project or a capability and
+// the globe turns to face those tools, lights them and routes packets between them. Certificates orbit as satellites.
+const DEVICON = 'https://cdn.jsdelivr.net/npm/devicon@2.16.0/icons/';
+// [name, devicon path ('' = text badge), capabilities, projects, 'inv' for dark logos]
+const TOOLS = [
+  ['ESP32', '', 'iot', 'agro taska'],
+  ['TensorFlow Lite', 'tensorflow/tensorflow-original', 'ml', 'agro'],
+  ['MobileNetV2', '', 'ml', 'agro'],
+  ['NFC', '', 'nfc', 'taska'],
+  ['Roboflow', '', 'cv', 'draft'],
+  ['Object detection', '', 'cv', 'draft'],
+  ['REST APIs', '', 'api', 'lamsoon agro'],
+  ['Cloudflare Workers', 'cloudflareworkers/cloudflareworkers-original', 'fn', 'lamsoon dapur'],
+  ['Cloud Functions', '', 'fn', 'rotee'],
+  ['PostgreSQL', 'postgresql/postgresql-original', 'db', 'lamsoon dapur'],
+  ['Supabase', 'supabase/supabase-original', 'db', 'lamsoon dapur'],
+  ['MySQL', 'mysql/mysql-original', 'db', 'halfday'],
+  ['SQL Server', 'microsoftsqlserver/microsoftsqlserver-original', 'db', ''],
+  ['SSO · RBAC · MFA', '', 'auth', 'lamsoon'],
+  ['Row-Level Security', '', 'auth', 'lamsoon'],
+  ['Next.js', 'nextjs/nextjs-original', 'web', 'lamsoon dapur', 'inv'],
+  ['React', 'react/react-original', 'web', 'lamsoon dapur rotee'],
+  ['TypeScript', 'typescript/typescript-original', 'web', 'lamsoon dapur'],
+  ['JavaScript', 'javascript/javascript-original', 'web', 'halfday'],
+  ['PHP', 'php/php-original', 'web', 'halfday'],
+  ['HTML/CSS', 'html5/html5-original', 'web', 'halfday'],
+  ['Tailwind CSS', 'tailwindcss/tailwindcss-original', 'web', 'dapur'],
+  ['Firebase', 'firebase/firebase-original', 'rt', 'agro rotee taska'],
+  ['FCM push', '', 'rt', 'taska'],
+  ['Flutter', 'flutter/flutter-original', 'mobile', 'agro rotee taska'],
+  ['Dart', 'dart/dart-original', 'mobile', 'agro rotee taska'],
+  ['JavaFX', '', '', 'taska'],
+  ['Java', 'java/java-original', '', 'taska'],
+  ['Vitest', 'vitest/vitest-original', 'test', 'lamsoon dapur'],
+  ['Playwright', 'playwright/playwright-original', 'test', 'lamsoon dapur'],
+  ['pgTAP', '', 'test', ''],
+  ['Testing Library', '', 'test', ''],
+  ['Node.js', 'nodejs/nodejs-original', '', ''],
+  ['Python', 'python/python-original', '', ''],
+  ['C++', 'cplusplus/cplusplus-original', '', ''],
+  ['Git', 'git/git-original', '', ''],
+  ['GitHub', 'github/github-original', '', '', 'inv'],
+  ['Docker', 'docker/docker-original', '', ''],
+  ['OpenAI API', '', '', ''],
+];
 
-  chips.forEach((el) => {
-    const n = el.dataset.p.split(' ').length;
-    const d = document.createElement('span');
-    d.className = 'w-dots';
-    d.title = `Used in ${n} project${n > 1 ? 's' : ''}`;
-    d.innerHTML = '<i></i>'.repeat(n);
-    el.appendChild(d);
+function initGlobe() {
+  const box = document.getElementById('globe');
+  if (!box) return;
+  const stage = box.querySelector('.globe-stage');
+  const cv = stage.querySelector('canvas'), ctx = cv.getContext('2d');
+  const rk = box.querySelector('.gr-k'), rt = box.querySelector('.gr-t'), rd = box.querySelector('.gr-d');
+  const pBtns = [...box.querySelectorAll('button[data-p]')], cBtns = [...box.querySelectorAll('button[data-cap]')];
+  const certLis = [...document.querySelectorAll('.cert-list li')];
+  const capName = Object.fromEntries(cBtns.map((b) => [b.dataset.cap, b.querySelector('span').textContent]));
+  const projName = Object.fromEntries(pBtns.map((b) => [b.dataset.p, b.textContent]));
+  const TAU = Math.PI * 2;
+  const norm = (v) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const fib = (i, n) => { const phi = Math.acos(1 - 2 * (i + 0.5) / n), th = Math.PI * (1 + Math.sqrt(5)) * i; return [Math.sin(phi) * Math.cos(th), Math.cos(phi), Math.sin(phi) * Math.sin(th)]; };
+
+  // ---- tools: placed near their capability's centre, then relaxed so they spread evenly ----
+  const groups = [...new Set(TOOLS.map((t) => t[2] || '-'))];
+  const centres = groups.map((_, i) => fib(i, groups.length));
+  const nodes = TOOLS.map(([name, icon, cap, p, flag], i) => {
+    const el = document.createElement('span');
+    el.className = 'gn' + (icon ? '' : ' gn-t');
+    el.innerHTML = icon ? `<img src="${DEVICON}${icon}.svg" alt="" draggable="false" decoding="async"${flag === 'inv' ? ' class="inv"' : ''}><i>${name}</i>` : `<b>${name}</b>`;
+    el.setAttribute('aria-hidden', 'true');
+    stage.appendChild(el);
+    const g = groups.indexOf(cap || '-'), c = centres[g], j = fib(i, TOOLS.length);
+    return { name, cap: cap ? cap.split(' ') : [], p: p ? p.split(' ') : [], el, g, free: !cap,
+      v: norm([c[0] + j[0] * 0.3, c[1] + j[1] * 0.3, c[2] + j[2] * 0.3]), delay: (i * 0.618) % 1, face: null, back: null };
+  });
+  for (let it = 0; it < 120; it++) {
+    nodes.forEach((a) => {
+      let f = [0, 0, 0];
+      nodes.forEach((b) => {
+        if (a === b) return;
+        const d = [a.v[0] - b.v[0], a.v[1] - b.v[1], a.v[2] - b.v[2]], d2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2] + 1e-3;
+        const k = 0.0045 / d2;
+        f = [f[0] + d[0] * k, f[1] + d[1] * k, f[2] + d[2] * k];
+      });
+      if (!a.free) { const c = centres[a.g]; f = [f[0] + (c[0] - a.v[0]) * 0.03, f[1] + (c[1] - a.v[1]) * 0.03, f[2] + (c[2] - a.v[2]) * 0.03]; }
+      a.v = norm([a.v[0] + f[0], a.v[1] + f[1], a.v[2] + f[2]]);
+    });
+  }
+
+  // ---- certificates: satellites on a tilted ring ----
+  const sats = certLis.map((li, i) => {
+    const el = document.createElement('span');
+    el.className = 'gsat';
+    el.textContent = li.dataset.i;
+    el.setAttribute('aria-hidden', 'true');
+    stage.appendChild(el);
+    return { li, el, a: (i / certLis.length) * TAU, back: null };
+  });
+  const RING_T = 0.32, RING_Z = -0.38;
+  function ringPoint(a, r) {
+    // circle in the x-z plane, tipped about x, then turned about the view axis
+    const x = Math.cos(a) * r, z0 = Math.sin(a) * r;
+    const y = -z0 * Math.sin(RING_T), z = z0 * Math.cos(RING_T);
+    return [x * Math.cos(RING_Z) - y * Math.sin(RING_Z), x * Math.sin(RING_Z) + y * Math.cos(RING_Z), z];
+  }
+
+  // ---- view ----
+  let rotX = 0.32, rotY = 0.6, vX = 0, vY = 0, tgt = null;
+  let S = 600, R = 200, C = 300, dpr = 1;
+  const BASE = REDUCE ? 0 : 0.0021;
+  function rot(v) {
+    const cy = Math.cos(rotY), sy = Math.sin(rotY), cx = Math.cos(rotX), sx = Math.sin(rotX);
+    const x = v[0] * cy + v[2] * sy, z0 = -v[0] * sy + v[2] * cy;
+    return [x, v[1] * cx - z0 * sx, v[1] * sx + z0 * cx];
+  }
+  const wrapA = (a) => { a = (a + Math.PI) % TAU; return (a < 0 ? a + TAU : a) - Math.PI; };
+  function faceOf(vs) {
+    let c = vs.reduce((s, v) => [s[0] + v[0], s[1] + v[1], s[2] + v[2]], [0, 0, 0]);
+    if (Math.hypot(...c) < 0.35 * vs.length) c = vs[0];
+    c = norm(c);
+    const y = Math.atan2(-c[0], c[2]), z0 = Math.hypot(c[0], c[2]);
+    return { y: rotY + wrapA(y - rotY), x: Math.max(-0.9, Math.min(0.9, Math.atan2(c[1], z0))) };
+  }
+  function resize() {
+    S = stage.clientWidth; dpr = Math.min(2, devicePixelRatio || 1);
+    R = S * (S < 480 ? 0.335 : 0.33); C = S / 2;
+    cv.width = Math.round(S * dpr); cv.height = Math.round(S * dpr);
+  }
+
+  // ---- state ----
+  let state = null, locked = null, selAt = 0, chain = [], touched = false, demo = null;
+  const same = (a, b) => !!a && !!b && a.p === b.p && a.cap === b.cap && a.tool === b.tool && a.cert === b.cert;
+  function lit(nd, s) {
+    if (!s) return false;
+    if (s.p) return nd.p.includes(s.p);
+    if (s.cap) return nd.cap.includes(s.cap);
+    return nd === s.tool;
+  }
+  const list = (a) => a.join(' · ');
+  function readout(s) {
+    if (!s) {
+      rk.textContent = 'KI-01 · Parts list';
+      rt.textContent = `${nodes.length} parts · ${cBtns.length} capabilities · ${sats.length} certificates`;
+      rd.textContent = 'Drag the globe to spin it. Pick a project to see what it was built with, or a capability to see the tools behind it.';
+    } else if (s.p) {
+      const on = nodes.filter((n) => lit(n, s));
+      rk.textContent = 'Project'; rt.textContent = projName[s.p];
+      rd.innerHTML = `<span class="mono">Built with</span>${list(on.map((n) => n.name))}`;
+    } else if (s.cap) {
+      const on = nodes.filter((n) => lit(n, s));
+      const ps = pBtns.filter((b) => on.some((n) => n.p.includes(b.dataset.p))).map((b) => b.textContent);
+      rk.textContent = 'Capability'; rt.textContent = capName[s.cap];
+      rd.innerHTML = `<span class="mono">Tools</span>${list(on.map((n) => n.name))}` + (ps.length ? `<span class="gr-gap"><span class="mono">Used in</span>${list(ps)}</span>` : '');
+    } else if (s.tool) {
+      const t = s.tool;
+      rk.textContent = t.cap.length ? capName[t.cap[0]] : 'Toolkit'; rt.textContent = t.name;
+      rd.innerHTML = t.p.length ? `<span class="mono">Used in</span>${list(t.p.map((p) => projName[p]))}` : 'Part of my everyday toolkit.';
+    } else if (s.cert) {
+      rk.textContent = 'Certificate · ' + s.cert.li.dataset.i; rt.textContent = s.cert.li.lastChild.textContent.trim();
+      rd.textContent = 'One of the satellites in orbit around the globe.';
+    }
+  }
+  function set(s) {
+    if (same(s, state) || (!s && !state)) return;
+    state = s; selAt = performance.now();
+    const on = nodes.filter((n) => lit(n, s));
+    // order the lit tools into a short chain, nearest first, for the packet routes
+    chain = [];
+    if (on.length > 1 && !(s && s.tool)) {
+      const left = on.slice(1); chain.push(on[0]);
+      while (left.length) {
+        const a = chain[chain.length - 1].v;
+        let bi = 0, bd = 9;
+        left.forEach((n, k) => { const d = (n.v[0] - a[0]) ** 2 + (n.v[1] - a[1]) ** 2 + (n.v[2] - a[2]) ** 2; if (d < bd) { bd = d; bi = k; } });
+        chain.push(left.splice(bi, 1)[0]);
+      }
+    }
+    box.classList.toggle('active', !!s);
+    nodes.forEach((n) => n.el.classList.toggle('on', on.includes(n)));
+    pBtns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? s.p === b.dataset.p : on.some((n) => n.p.includes(b.dataset.p)))));
+    cBtns.forEach((b) => b.classList.toggle('on', !!s && (s.cap ? s.cap === b.dataset.cap : on.some((n) => n.cap.includes(b.dataset.cap)))));
+    sats.forEach((t) => { const hit = !!s && s.cert === t; t.el.classList.toggle('on', hit); t.li.classList.toggle('on', hit); });
+    // turn to face the lit tools, but not when hovering a single tool (it would slide out from under the cursor)
+    tgt = on.length && !(s && s.tool) ? faceOf(on.map((n) => n.v)) : null;
+    if (REDUCE && tgt) { rotX = tgt.x; rotY = tgt.y; }
+    readout(s);
+    kick();
+  }
+  const release = () => set(locked);
+  const stopDemo = () => { touched = true; clearInterval(demo); };
+  const toggleLock = (s) => { stopDemo(); locked = same(locked, s) ? null : s; set(locked); };
+
+  pBtns.forEach((b) => {
+    const s = () => ({ p: b.dataset.p });
+    b.addEventListener('mouseenter', () => { stopDemo(); set(s()); });
+    b.addEventListener('focus', () => { stopDemo(); set(s()); });
+    b.addEventListener('mouseleave', release); b.addEventListener('blur', release);
+    b.addEventListener('click', () => toggleLock(s()));
+  });
+  cBtns.forEach((b) => {
+    const s = () => ({ cap: b.dataset.cap });
+    b.addEventListener('mouseenter', () => { stopDemo(); set(s()); });
+    b.addEventListener('focus', () => { stopDemo(); set(s()); });
+    b.addEventListener('mouseleave', release); b.addEventListener('blur', release);
+    b.addEventListener('click', () => toggleLock(s()));
+  });
+  nodes.forEach((n) => {
+    n.el.addEventListener('mouseenter', () => { if (!drag) { stopDemo(); set({ tool: n }); } });
+    n.el.addEventListener('mouseleave', () => { if (!drag) release(); });
+  });
+  sats.forEach((t) => {
+    t.el.addEventListener('mouseenter', () => { if (!drag) { stopDemo(); set({ cert: t }); } });
+    t.el.addEventListener('mouseleave', () => { if (!drag) release(); });
+    t.li.addEventListener('mouseenter', () => { stopDemo(); set({ cert: t }); });
+    t.li.addEventListener('mouseleave', release);
   });
 
-  // ---------- the packet's route: sensor -> model -> API -> database -> sync -> app -> screen ----------
-  const ROUTE = [
-    { id: 'iot', cap: 'A sensor reading leaves the device' },
-    { id: 'ml', cap: 'An on-device model checks it first' },
-    { via: true },
-    { id: 'api', cap: 'An API carries it up to the cloud' },
-    { id: 'db', cap: 'The database stores it' },
-    { via: true },
-    { id: 'rt', cap: 'Real-time sync pushes it out' },
-    { id: 'mobile', cap: 'The app picks it up' },
-    { id: 'screen', cap: 'And it lands on a screen' },
-  ];
-  const get = (id) => (id === 'screen' ? screenEl : box.querySelector(`.sk[data-id="${id}"]`));
-  let pts = [], segs = [], packet = null, T = [], fit = 1, sceneH = 0;
-
-  function measure() {
-    T = layers.map((l) => l.offsetTop);
-    sceneH = scene.offsetHeight;
-    // shrink the flat stack on short screens so the whole thing fits in the pinned view
-    const outer = (el) => { const s = getComputedStyle(el); return el.offsetHeight + parseFloat(s.marginTop) + parseFloat(s.marginBottom); };
-    const other = [...pin.children].filter((el) => el !== stage).reduce((sum, el) => sum + outer(el), 0) + 20;
-    fit = box.classList.contains('is-scroll') ? Math.min(1, (innerHeight - 64 - other) / sceneH) : 1;
-    stage.style.height = box.classList.contains('is-scroll') ? `${sceneH * fit}px` : '';
-    // packet route in scene coordinates (all boards overlap at the first board while stacked)
-    pts = [];
-    ROUTE.forEach((r, k) => {
-      if (r.via) {
-        const prev = pts[pts.length - 1];
-        const next = get(ROUTE[k + 1].id);
-        pts.push({ x: prev.x, y: prev.y, L: layers.indexOf(next.closest('.layer')) });
-        return;
-      }
-      const el = get(r.id), L = el.closest('.layer');
-      pts.push({ x: L.offsetLeft + el.offsetLeft + el.offsetWidth / 2, y: T[0] + el.offsetTop + el.offsetHeight / 2, L: layers.indexOf(L), el, cap: r.cap });
-    });
-    scene.querySelectorAll('.fx-seg, .fx-via, .fx-packet').forEach((e) => e.remove());
-    segs = pts.slice(1).map((pt, k) => {
-      const e = document.createElement('div');
-      e.className = pt.L !== pts[k].L ? 'fx-via' : 'fx-seg';
-      scene.appendChild(e);
-      return e;
-    });
-    packet = document.createElement('div');
-    packet.className = 'fx-packet';
-    scene.appendChild(packet);
+  // ---- drag to spin (touch: sideways spins, up and down still scrolls the page) ----
+  let drag = null;
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.button) return;
+    drag = { x: e.clientX, y: e.clientY, moved: 0, id: e.pointerId, target: e.target };
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
+    if (drag.moved > 5 && !stage.classList.contains('grab')) {
+      stage.classList.add('grab'); stopDemo(); tgt = null;
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    if (stage.classList.contains('grab')) {
+      vY = dx * 0.008; vX = e.pointerType === 'touch' ? 0 : dy * 0.008;
+      rotY += vY; rotX = Math.max(-1.1, Math.min(1.1, rotX + vX));
+      kick();
+    }
+  });
+  function endDrag(e) {
+    if (!drag || (e && e.pointerId !== drag.id)) return;
+    const tap = drag.moved <= 5, t = drag.target;
+    drag = null; stage.classList.remove('grab');
+    if (!tap || !e || e.type !== 'pointerup') return;
+    const n = nodes.find((nd) => nd.el.contains(t)), st = sats.find((s) => s.el.contains(t));
+    if (n) toggleLock({ tool: n });
+    else if (st) toggleLock({ cert: st });
+    else if (locked) { locked = null; set(null); }
   }
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
 
-  let flat = false, mode = '';
-  function setMode() {
-    const m = REDUCE || small.matches ? 'static' : 'scroll';
-    if (m === mode) return;
-    mode = m;
-    box.classList.toggle('is-scroll', m === 'scroll');
-    box.classList.toggle('is-static', m === 'static');
-    if (m === 'static') {
-      scene.style.transform = '';
-      layers.forEach((l) => { l.style.transform = ''; });
-      scene.querySelectorAll('.fx-seg, .fx-via, .fx-packet').forEach((e) => e.remove());
-      chips.forEach((c) => c.classList.remove('hit'));
+  // ---- render ----
+  let running = false, raf = 0, introAt = 0, visible = false;
+  function intro(now, d) { return REDUCE || !introAt ? 1 : smooth((now - introAt) / 1100 - d * 0.5); }
+  function strokeSplit(pts, front, back) {
+    for (let k = 1; k < pts.length; k++) {
+      const a = pts[k - 1], b = pts[k], p = (a[2] + b[2]) > 0 ? front : back;
+      p.moveTo(a[0], a[1]); p.lineTo(b[0], b[1]);
     }
   }
+  const scr = (v, r = R) => { const p = rot(v); return [C + p[0] * r, C + p[1] * r, p[2]]; };
+  function draw(now) {
+    const k0 = intro(now, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, S, S);
+    // glow and body
+    const g = ctx.createRadialGradient(C, C, R * 0.2, C, C, R * 1.6);
+    g.addColorStop(0, 'rgba(255,90,31,.10)'); g.addColorStop(0.55, 'rgba(212,165,72,.035)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+    // orbit ring, back half first
+    const ringF = new Path2D(), ringB = new Path2D(), ring = [];
+    for (let a = 0; a <= TAU + 0.001; a += TAU / 120) { const p = ringPoint(a, 1.38 * R); ring.push([C + p[0], C + p[1], p[2]]); }
+    strokeSplit(ring, ringF, ringB);
+    ctx.lineWidth = 1; ctx.strokeStyle = `rgba(212,165,72,${0.16 * k0})`; ctx.stroke(ringB);
+    ctx.beginPath(); ctx.arc(C, C, R, 0, TAU); ctx.fillStyle = `rgba(7,9,7,${0.78 * k0})`; ctx.fill();
+    // graticule
+    const gf = new Path2D(), gb = new Path2D(), Rk = R * (0.6 + 0.4 * k0);
+    for (let lat = -75; lat <= 75; lat += 15) {
+      const la = lat * Math.PI / 180, pts = [];
+      for (let t = 0; t <= TAU + 0.001; t += TAU / 72) pts.push(scr([Math.cos(la) * Math.cos(t), Math.sin(la), Math.cos(la) * Math.sin(t)], Rk));
+      strokeSplit(pts, gf, gb);
+    }
+    for (let lon = 0; lon < 180; lon += 15) {
+      const lo = lon * Math.PI / 180, pts = [];
+      for (let t = 0; t <= TAU + 0.001; t += TAU / 72) pts.push(scr([Math.sin(t) * Math.cos(lo), Math.cos(t), Math.sin(t) * Math.sin(lo)], Rk));
+      strokeSplit(pts, gf, gb);
+    }
+    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = `rgba(212,165,72,${0.06 * k0})`; ctx.stroke(gb);
+    ctx.strokeStyle = `rgba(212,165,72,${0.2 * k0})`; ctx.stroke(gf);
+    // a scanning meridian
+    if (!REDUCE) {
+      const lo = (now * 0.00035) % TAU, pts = [], sf = new Path2D(), sb = new Path2D();
+      for (let t = 0; t <= TAU + 0.001; t += TAU / 90) pts.push(scr([Math.sin(t) * Math.cos(lo), Math.cos(t), Math.sin(t) * Math.sin(lo)], Rk));
+      strokeSplit(pts, sf, sb);
+      ctx.lineWidth = 1.4; ctx.strokeStyle = `rgba(255,90,31,${0.3 * k0})`; ctx.stroke(sf);
+    }
+    ctx.beginPath(); ctx.arc(C, C, Rk, 0, TAU); ctx.lineWidth = 1.2; ctx.strokeStyle = `rgba(212,165,72,${0.38 * k0})`; ctx.stroke();
+    // packet routes between lit tools
+    if (chain.length > 1) {
+      const grow = REDUCE ? 1 : clamp01((now - selAt) / 750);
+      const af = new Path2D(), ab = new Path2D(), heads = [];
+      for (let j = 1; j < chain.length; j++) {
+        const a = chain[j - 1].v, b = chain[j].v;
+        const ang = Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
+        const lift = 0.06 + 0.28 * ang / Math.PI, sa = Math.sin(ang) || 1;
+        const reach = clamp01(grow * 1.5 - (j - 1) * (0.5 / chain.length));
+        const pts = [];
+        const at = (t) => {
+          const w1 = Math.sin((1 - t) * ang) / sa, w2 = Math.sin(t * ang) / sa, h = 1 + Math.sin(Math.PI * t) * lift;
+          return scr([(a[0] * w1 + b[0] * w2) * h, (a[1] * w1 + b[1] * w2) * h, (a[2] * w1 + b[2] * w2) * h]);
+        };
+        for (let s = 0; s <= 28; s++) { const t = (s / 28) * reach; pts.push(at(t)); }
+        strokeSplit(pts, af, ab);
+        if (reach >= 1 && !REDUCE) heads.push(at((now * 0.00042 + j * 0.31) % 1));
+      }
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,90,31,.22)'; ctx.stroke(ab);
+      ctx.save(); ctx.shadowColor = 'rgba(255,90,31,.9)'; ctx.shadowBlur = 8;
+      ctx.lineWidth = 1.8; ctx.strokeStyle = 'rgba(255,90,31,.85)'; ctx.stroke(af);
+      heads.forEach(([x, y, z]) => { ctx.beginPath(); ctx.arc(x, y, 2.8, 0, TAU); ctx.fillStyle = z > 0 ? '#fff1e6' : 'rgba(255,200,170,.35)'; ctx.fill(); });
+      ctx.restore();
+    }
+    ctx.lineWidth = 1; ctx.strokeStyle = `rgba(212,165,72,${0.34 * k0})`; ctx.stroke(ringF);
 
-  function frame() {
-    if (mode !== 'scroll') { setFlat(true); return; }
-    const r = box.getBoundingClientRect();
-    const p = clamp01((64 - r.top) / Math.max(1, r.height - (innerHeight - 64)));
-    const e = smooth(span(p, 0.05, 0.28));      // boards pull apart
-    const q = span(p, 0.32, 0.7);               // packet travels
-    const f = smooth(span(p, 0.75, 0.93));      // boards lie flat
-    const gap = lerp(10, 92, e);
-    const z = (L) => (layers.length - 1 - L) * gap;
-
-    const rx = 56 * (1 - f), rz = -32 * (1 - f), sc = lerp(0.6, fit, f);
-    const lift = ((sceneH - layers[0].offsetHeight) * 0.42 + (layers.length - 1) * gap * 0.5) * (1 - f);
-    scene.style.transform = f >= 1 ? (fit < 1 ? `scale(${fit})` : 'none')
-      : `translateY(${lift}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc})`;
-    layers.forEach((l, i) => {
-      l.style.transform = f >= 1 ? 'none' : `translate3d(0, ${-(T[i] - T[0]) * (1 - f)}px, ${z(i) * (1 - f)}px)`;
+    // tools
+    const any = !!state;
+    nodes.forEach((n) => {
+      const k = intro(now, n.delay);
+      const [x, y, z] = rot(n.v), d = (z + 1) / 2, on = n.el.classList.contains('on');
+      const sc = (0.5 + d * 0.62) * (0.4 + 0.6 * k);
+      let op = (0.12 + d * 0.88) * k;
+      if (any && !on) op *= 0.28; else if (on) op = Math.max(op, 0.5 * k);
+      n.el.style.transform = `translate(${(C + x * R * k).toFixed(1)}px,${(C + y * R * k).toFixed(1)}px) translate(-50%,-50%) scale(${sc.toFixed(3)})`;
+      n.el.style.opacity = op.toFixed(3);
+      n.el.style.zIndex = String(Math.round(d * 100));
+      const face = z > 0.45, back = z < -0.1;
+      if (face !== n.face) { n.face = face; n.el.classList.toggle('face', face); }
+      if (back !== n.back) { n.back = back; n.el.classList.toggle('back', back); }
     });
-    cover.style.opacity = String(1 - span(e, 0, 0.55));
-
-    // packet: walk the route in 3D, revealing the trace behind it
-    const P = pts.map((pt) => [pt.x, pt.y, z(pt.L)]);
-    const lens = P.slice(1).map((b, k) => Math.hypot(b[0] - P[k][0], b[1] - P[k][1], b[2] - P[k][2]));
-    const total = lens.reduce((a, b) => a + b, 0);
-    let d = q * total, acc = 0, cur = P[0];
-    const fade = String(1 - f);
-    segs.forEach((el, k) => {
-      const a = P[k], b = P[k + 1], len = lens[k];
-      const t = clamp01((d - acc) / (len || 1));
-      if (t > 0 && t <= 1 && d >= acc) cur = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
-      if (el.className === 'fx-via') {
-        el.style.height = `${a[2] - b[2]}px`;
-        el.style.transform = `translate3d(${a[0]}px, ${a[1]}px, ${a[2]}px) rotateX(-90deg) scaleY(${t})`;
+    // satellites
+    sats.forEach((t) => {
+      const a = t.a + (REDUCE ? 0 : now * 0.00011);
+      const [x, y, z] = ringPoint(a, 1.38 * R), d = z / (1.38 * R);
+      const hidden = z < 0 && Math.hypot(x, y) < R;
+      let op = (hidden ? 0.18 : 0.55 + 0.45 * Math.max(0, d)) * k0;
+      if (any && !t.el.classList.contains('on')) op *= 0.5;
+      t.el.style.transform = `translate(${(C + x).toFixed(1)}px,${(C + y).toFixed(1)}px) translate(-50%,-50%) scale(${(0.82 + 0.18 * (d + 1) / 2).toFixed(3)})`;
+      t.el.style.opacity = op.toFixed(3);
+      t.el.style.zIndex = String(z < 0 ? 0 : 120);
+      const back = hidden;
+      if (back !== t.back) { t.back = back; t.el.classList.toggle('back', back); }
+    });
+  }
+  function tick(now) {
+    raf = 0;
+    if (!drag || !stage.classList.contains('grab')) {
+      if (tgt) {
+        rotY += (tgt.y - rotY) * 0.075; rotX += (tgt.x - rotX) * 0.075;
+        if (Math.abs(tgt.y - rotY) < 0.002 && Math.abs(tgt.x - rotX) < 0.002) { rotY = tgt.y; rotX = tgt.x; }
       } else {
-        el.style.width = `${len}px`;
-        el.style.transform = `translate3d(${a[0]}px, ${a[1]}px, ${a[2]}px) rotate(${Math.atan2(b[1] - a[1], b[0] - a[0])}rad) scaleX(${t})`;
+        vY = vY * 0.95 + (state ? 0 : BASE) * 0.05; vX *= 0.92;
+        rotY += vY; rotX = Math.max(-1.1, Math.min(1.1, rotX + vX));
+        if (!state) rotX += (0.32 - rotX) * 0.01;
       }
-      el.style.opacity = t > 0 ? fade : '0';
-      acc += len;
-    });
-    packet.style.opacity = q > 0 && q < 1 && f < 1 ? '1' : '0';
-    packet.style.transform = `translate3d(${cur[0]}px, ${cur[1]}px, ${cur[2] + 2}px) rotateZ(${-rz}deg) rotateX(${-rx}deg)`;
-
-    // light each part the packet has reached, and caption the step
-    let reached = -1; acc = 0;
-    pts.forEach((pt, k) => {
-      if (k) acc += lens[k - 1];
-      const on = q > 0 && d >= acc - 1 && f < 1;
-      if (pt.el) pt.el.classList.toggle(pt.el === screenEl ? 'live' : 'hit', on);
-      if (on && pt.cap) reached = k;
-    });
-    let text = '';
-    if (f > 0.02) text = '<b>04</b>Hover a project to see what it used';
-    else if (reached >= 0) text = `<b>${String(ROUTE.slice(0, reached + 1).filter((r) => !r.via).length).padStart(2, '0')}</b>${pts[reached].cap}`;
-    else if (e > 0.05) text = '<b>01</b>Four boards, one system';
-    else text = '<b>00</b>Scroll to take it apart';
-    if (cap.innerHTML !== text) cap.innerHTML = text;
-    setFlat(f >= 1);
-  }
-
-  // ---------- flat: wire projects to skills ----------
-  let wires = [];
-  function trace(P, r = 8) {
-    let d = `M${P[0][0]} ${P[0][1]}`;
-    for (let k = 1; k < P.length - 1; k++) {
-      const [px, py] = P[k - 1], [x, y] = P[k], [nx, ny] = P[k + 1];
-      const a = Math.min(r, Math.hypot(x - px, y - py) / 2), b = Math.min(r, Math.hypot(nx - x, ny - y) / 2);
-      const ux = Math.sign(x - px), uy = Math.sign(y - py), vx = Math.sign(nx - x), vy = Math.sign(ny - y);
-      d += ` L${x - ux * a} ${y - uy * a} Q${x} ${y} ${x + vx * b} ${y + vy * b}`;
     }
-    const [lx, ly] = P[P.length - 1];
-    return d + ` L${lx} ${ly}`;
+    draw(now);
+    if (running) raf = requestAnimationFrame(tick);
   }
-  function layoutWires() {
-    hotL.innerHTML = ''; wires = [];
-    if (small.matches) return;
-    const S = stage.getBoundingClientRect();
-    svg.setAttribute('viewBox', `0 0 ${S.width} ${S.height}`);
-    const rel = (el) => { const r = el.getBoundingClientRect(); return { l: r.left - S.left, r: r.right - S.left, t: r.top - S.top, b: r.bottom - S.top }; };
-    const row = rel(box.querySelector('.stack-projects'));
-    btns.forEach((b, i) => {
-      let from = rel(b), exitY = row.b + 4 + i * 2.2;
-      chips.filter((c) => uses(c, b.dataset.p)).forEach((c, k) => {
-        const to = rel(c), cy = (to.t + to.b) / 2, lane = to.l - 9;
-        const fx = (from.l + from.r) / 2;
-        const d = trace([[fx, from.b], [fx, exitY], [lane, exitY], [lane, cy], [to.l, cy]]);
-        const g = document.createElementNS(NS, 'g');
-        for (const cls of ['w-glow', 'w-flow']) {
-          const path = document.createElementNS(NS, 'path');
-          path.setAttribute('d', d); path.setAttribute('class', cls);
-          g.appendChild(path);
-        }
-        hotL.appendChild(g);
-        g.style.setProperty('--len', g.firstChild.getTotalLength().toFixed(1));
-        g.style.setProperty('--d', `${(k * 0.16).toFixed(2)}s`);
-        wires.push({ p: b.dataset.p, chip: c, g });
-        from = to; exitY = to.b + 5;
-      });
-    });
-    apply();
-  }
+  // with reduced motion, draw only when something changes
+  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
 
-  let state = null, locked = null, touched = false, demo = null, demoStarted = false;
-  function apply() {
-    const s = flat ? state : null;
-    box.classList.toggle('active', !!s);
-    chips.forEach((c) => c.classList.toggle('on', !!s && (s.p ? uses(c, s.p) : c === s.chip)));
-    btns.forEach((b) => b.classList.toggle('on', !!s && (s.p ? b.dataset.p === s.p : uses(s.chip, b.dataset.p))));
-    wires.forEach((w) => w.g.classList.toggle('on', !!s && (s.p ? w.p === s.p : w.chip === s.chip)));
-  }
-  function setFlat(v) {
-    if (v === flat) return;
-    flat = v;
-    box.classList.toggle('is-flat', v);
-    if (v) {
-      layoutWires();
-      if (mode === 'scroll') startDemo(); else onVisible(box, startDemo, 0.3);
-    } else { clearInterval(demo); apply(); }
-  }
-  function startDemo() {
-    if (demoStarted || touched || REDUCE) return;
-    demoStarted = true;
+  resize(); readout(null);
+  new ResizeObserver(() => { resize(); kick(); }).observe(stage);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !introAt) introAt = performance.now();
+      running = visible && !REDUCE;
+      if (running || visible) kick();
+    }, { threshold: 0 }).observe(stage);
+  } else { running = !REDUCE; kick(); }
+
+  // until someone interacts, tour the projects once the globe is in view
+  if (!REDUCE) onVisible(stage, () => {
     let i = 0;
     demo = setInterval(() => {
-      if (touched || !flat) return clearInterval(demo);
-      if (i >= btns.length) { clearInterval(demo); state = locked ? { p: locked } : null; apply(); return; }
-      state = { p: btns[i++].dataset.p }; apply();
-    }, 1500);
-  }
-  const showProject = (p) => { state = p ? { p } : null; apply(); };
-  const stopDemo = () => { touched = true; clearInterval(demo); };
-  btns.forEach((b) => {
-    b.addEventListener('mouseenter', () => { stopDemo(); showProject(b.dataset.p); });
-    b.addEventListener('focus', () => { stopDemo(); showProject(b.dataset.p); });
-    b.addEventListener('mouseleave', () => showProject(locked));
-    b.addEventListener('blur', () => showProject(locked));
-    b.addEventListener('click', () => { stopDemo(); locked = locked === b.dataset.p ? null : b.dataset.p; showProject(locked); });
-  });
-  chips.forEach((c) => {
-    c.addEventListener('mouseenter', () => { stopDemo(); state = { chip: c }; apply(); });
-    c.addEventListener('mouseleave', () => showProject(locked));
-  });
-
-  let raf = 0;
-  const tick = () => { raf = 0; frame(); };
-  const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
-  function relayout() {
-    setMode();
-    const wasFlat = flat;
-    if (mode === 'scroll') {
-      scene.style.transform = 'none';
-      layers.forEach((l) => { l.style.transform = 'none'; });
-      measure();
-    } else stage.style.height = '';
-    frame();
-    if (wasFlat && flat) layoutWires();
-  }
-  addEventListener('scroll', queue, { passive: true });
-  addEventListener('resize', relayout);
-  small.addEventListener('change', relayout);
-  if (document.fonts) document.fonts.ready.then(relayout);
-  relayout();
+      if (touched) return clearInterval(demo);
+      if (i >= pBtns.length) { clearInterval(demo); set(null); return; }
+      set({ p: pBtns[i++].dataset.p });
+    }, 2800);
+  }, 0.45);
 }
 
 // Case files: a full-screen overlay per project with a photo gallery and the full story.
@@ -1551,7 +1686,7 @@ function initUI() {
   initChips();
   initLogLogos();
   initScope();
-  initStack();
+  initGlobe();
   initCaseFiles();
 }
 

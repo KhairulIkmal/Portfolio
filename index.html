@@ -279,72 +279,60 @@
             <li data-short="KMJ 3.98" data-kind="Education" data-logo="assets/logos/kmj.png"><span class="mono">2022</span><span><strong>Foundation in Science (Physical), Kolej Matrikulasi Johor.</strong> CGPA 3.98.</span><span class="mono tag">Education</span></li>
           </ol>
 
-          <div class="stack" id="stack">
-            <div class="stack-pin">
-              <div class="sheet-head sheet-head--sub stack-head">
-                <div><p class="mono sec-k"><b>§06</b>Stack</p><h2 class="disp">From sensor to screen</h2></div>
-                <span class="mono muted">Scroll to assemble · hover a project or a skill</span>
-              </div>
-              <div class="stack-projects mono" role="group" aria-label="Highlight skills by project">
-                <button type="button" data-p="lamsoon">Lam Soon</button>
-                <button type="button" data-p="agro">AgroEzuran</button>
-                <button type="button" data-p="dapur">Dapur Kayu Mak</button>
-                <button type="button" data-p="rotee">ROTEE</button>
-                <button type="button" data-p="taska">Taska</button>
-                <button type="button" data-p="halfday">Halfday Cafe</button>
-                <button type="button" data-p="draft">Draft Detector</button>
-              </div>
-              <div class="stack-stage">
-                <div class="stack-scene">
-                  <section class="layer" aria-label="Device layer">
-                    <p class="layer-h mono"><b>01</b>Device<span>Sensors, NFC and on-device AI</span></p>
-                    <ul class="layer-skills">
-                      <li class="sk" data-id="iot" data-p="agro taska"><strong>IoT and embedded systems</strong><span class="mono">ESP32, ESP32-CAM, sensors</span></li>
-                      <li class="sk" data-id="ml" data-p="agro"><strong>Machine learning (on-device)</strong><span class="mono">TensorFlow Lite, MobileNetV2</span></li>
-                      <li class="sk" data-id="nfc" data-p="taska"><strong>NFC integration</strong><span class="mono">NFC readers and tags</span></li>
-                      <li class="sk" data-id="cv" data-p="draft"><strong>Computer vision</strong><span class="mono">Object detection, Roboflow</span></li>
-                    </ul>
-                    <div class="layer-cover" aria-hidden="true"><span class="mono">KI-01</span><strong>Stack</strong><span class="mono">4 boards · 12 parts · Rev 2026</span></div>
-                  </section>
-                  <section class="layer" aria-label="Cloud layer">
-                    <p class="layer-h mono"><b>02</b>Cloud<span>APIs, data and security</span></p>
-                    <ul class="layer-skills">
-                      <li class="sk" data-id="api" data-p="lamsoon agro"><strong>REST APIs and integration</strong><span class="mono">REST, one portal for 7 systems</span></li>
-                      <li class="sk" data-id="fn" data-p="lamsoon dapur rotee"><strong>Serverless and cloud functions</strong><span class="mono">Cloudflare Workers, Cloud Functions</span></li>
-                      <li class="sk" data-id="db" data-p="lamsoon dapur halfday"><strong>Database design and SQL</strong><span class="mono">PostgreSQL, Supabase, MySQL</span></li>
-                      <li class="sk" data-id="auth" data-p="lamsoon"><strong>Authentication and access control</strong><span class="mono">SSO, RBAC, MFA, Row-Level Security</span></li>
-                    </ul>
-                  </section>
-                  <section class="layer" aria-label="Apps layer">
-                    <p class="layer-h mono"><b>03</b>Apps<span>What people actually use</span></p>
-                    <ul class="layer-skills">
-                      <li class="sk" data-id="web" data-p="lamsoon dapur rotee halfday"><strong>Full-stack web development</strong><span class="mono">Next.js, React, TypeScript, PHP</span></li>
-                      <li class="sk" data-id="rt" data-p="agro rotee taska"><strong>Real-time apps and push</strong><span class="mono">Firestore, FCM</span></li>
-                      <li class="sk" data-id="mobile" data-p="agro rotee taska"><strong>Cross-platform mobile</strong><span class="mono">Flutter, Dart</span></li>
-                      <li class="sk-screen" aria-hidden="true"><span class="mono">Live · simulated</span><strong>Soil 38%</strong><span class="mono">Pump on · rain 20%</span></li>
-                    </ul>
-                  </section>
-                  <section class="layer layer-q" aria-label="Quality layer">
-                    <p class="layer-h mono"><b>04</b>Quality<span>Runs under everything</span></p>
-                    <ul class="layer-skills">
-                      <li class="sk" data-id="test" data-p="lamsoon dapur"><strong>Automated testing</strong><span class="mono">Unit, E2E and database tests · Vitest, Playwright, pgTAP</span></li>
-                    </ul>
-                  </section>
-                </div>
-                <svg class="stack-wires" aria-hidden="true"><g class="wire-hot"></g></svg>
-              </div>
-              <p class="stack-cap mono" aria-hidden="true"></p>
+          <div class="globe" id="globe">
+            <div class="sheet-head sheet-head--sub globe-head">
+              <div><p class="mono sec-k"><b>§06</b>Stack</p><h2 class="disp">Every part I build with</h2></div>
+              <span class="mono muted">Drag to spin · pick a project or a capability</span>
             </div>
+            <div class="globe-grid">
+              <div class="globe-stage" role="img" aria-label="A spinning globe of the tools I use, with my certificates in orbit">
+                <canvas aria-hidden="true"></canvas>
+              </div>
+              <div class="globe-side">
+                <p class="mono globe-k">Projects</p>
+                <div class="globe-projects mono" role="group" aria-label="Highlight tools by project">
+                  <button type="button" data-p="lamsoon">Lam Soon</button>
+                  <button type="button" data-p="agro">AgroEzuran</button>
+                  <button type="button" data-p="dapur">Dapur Kayu Mak</button>
+                  <button type="button" data-p="rotee">ROTEE</button>
+                  <button type="button" data-p="taska">Taska</button>
+                  <button type="button" data-p="halfday">Halfday Cafe</button>
+                  <button type="button" data-p="draft">Draft Detector</button>
+                </div>
+                <p class="mono globe-k">Capabilities</p>
+                <ul class="globe-caps" aria-label="Highlight tools by capability">
+                  <li><button type="button" data-cap="iot"><b>01</b><span>IoT and embedded systems</span></button></li>
+                  <li><button type="button" data-cap="ml"><b>02</b><span>Machine learning (on-device)</span></button></li>
+                  <li><button type="button" data-cap="nfc"><b>03</b><span>NFC integration</span></button></li>
+                  <li><button type="button" data-cap="cv"><b>04</b><span>Computer vision</span></button></li>
+                  <li><button type="button" data-cap="api"><b>05</b><span>REST APIs and integration</span></button></li>
+                  <li><button type="button" data-cap="fn"><b>06</b><span>Serverless and cloud functions</span></button></li>
+                  <li><button type="button" data-cap="db"><b>07</b><span>Database design and SQL</span></button></li>
+                  <li><button type="button" data-cap="auth"><b>08</b><span>Authentication and access control</span></button></li>
+                  <li><button type="button" data-cap="web"><b>09</b><span>Full-stack web development</span></button></li>
+                  <li><button type="button" data-cap="rt"><b>10</b><span>Real-time apps and push</span></button></li>
+                  <li><button type="button" data-cap="mobile"><b>11</b><span>Cross-platform mobile</span></button></li>
+                  <li><button type="button" data-cap="test"><b>12</b><span>Automated testing</span></button></li>
+                </ul>
+                <div class="globe-read" aria-live="polite"><p class="mono gr-k"></p><p class="gr-t"></p><p class="gr-d"></p></div>
+              </div>
+            </div>
+            <p class="globe-sr">Tools: ESP32, TensorFlow Lite, MobileNetV2, NFC, Roboflow, object detection, REST APIs, Cloudflare Workers, Cloud Functions, PostgreSQL, Supabase, MySQL, Microsoft SQL Server, SSO, RBAC, MFA, Row-Level Security, Next.js, React, TypeScript, JavaScript, PHP, HTML/CSS, Tailwind CSS, Firebase, Firebase Cloud Messaging, Flutter, Dart, JavaFX, Java, Vitest, Playwright, pgTAP, React Testing Library, Node.js, Python, C++, Git, GitHub, Docker, OpenAI API.</p>
           </div>
-          <div class="bom">
-            <p class="mono bom-h"><b>BOM</b>Bill of materials: everything else I work with</p>
-            <dl class="bom-grid">
-              <div><dt class="mono">Languages</dt><dd>TypeScript · JavaScript · SQL · Dart · Java · Python · PHP · C++ · HTML/CSS</dd></div>
-              <div><dt class="mono">Frameworks</dt><dd>Next.js (App Router) · React · Flutter · Tailwind CSS · JavaFX</dd></div>
-              <div><dt class="mono">Data and backend</dt><dd>PostgreSQL · Supabase · Firebase · MySQL · Microsoft SQL Server · Node.js · REST APIs</dd></div>
-              <div><dt class="mono">Testing and tools</dt><dd>Vitest · Playwright · pgTAP · React Testing Library · Git · GitHub · Docker · OpenAI API</dd></div>
-            </dl>
-            <p class="pin-also"><span class="mono">Training</span> CCNA: Introduction to Networks (Cisco) · Machine Learning Using SAS Viya (SAS) <span class="mono pin-gap">Languages</span> Malay (native) · English (proficient)</p>
+          <div class="certs">
+            <p class="mono bom-h"><b>CERT</b>Certificates in orbit</p>
+            <ul class="cert-list">
+              <li data-i="UTHM"><span class="mono">UTHM</span>Dean's List Student</li>
+              <li data-i="Cisco"><span class="mono">Cisco</span>CCNA: Introduction to Networks</li>
+              <li data-i="AWS"><span class="mono">AWS</span>AWS Academy Workshop</li>
+              <li data-i="SAS"><span class="mono">SAS</span>Machine Learning Using SAS Viya</li>
+              <li data-i="SAS"><span class="mono">SAS</span>SAS Viya Overview</li>
+              <li data-i="Google"><span class="mono">Google</span>Gemini Certified University Student</li>
+              <li data-i="HPE Aruba"><span class="mono">HPE Aruba</span>Aruba Instant AP (IAP) Configuration</li>
+              <li data-i="SAS"><span class="mono">SAS</span>Data Literacy in Practice</li>
+              <li data-i="SAS"><span class="mono">SAS</span>Data Literacy Essentials</li>
+            </ul>
+            <p class="pin-also"><span class="mono">Languages</span> Malay (native) · English (proficient)</p>
           </div>
         </div>
       </div>
