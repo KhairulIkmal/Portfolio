@@ -1221,7 +1221,7 @@ function initGlobe() {
   const sats = certLis.map((li, i) => {
     const el = document.createElement('span');
     el.className = 'gsat';
-    el.textContent = li.dataset.i;
+    el.innerHTML = `<span class="gsat-logo"><img src="${li.dataset.logo}" alt="" draggable="false"${li.dataset.crop ? ' class="crop-top"' : ''}></span>${li.dataset.i}`;
     el.setAttribute('aria-hidden', 'true');
     stage.appendChild(el);
     return { li, el, a: (i / certLis.length) * TAU, back: null };
