@@ -380,9 +380,10 @@
         <button type="button" class="cf-x" data-cf-close aria-label="Close case file">✕</button>
       </header>
       <div class="cf-body">
-        <section class="cf-gallery" aria-label="Photos">
+        <section class="cf-gallery" aria-label="Demo and photos">
           <div class="cf-stage" id="cfStage">
             <img id="cfImg" alt="">
+            <div class="cf-video" id="cfVideo" hidden></div>
             <button type="button" class="cf-nav cf-prev" id="cfPrev" aria-label="Previous photo">◀</button>
             <button type="button" class="cf-nav cf-next" id="cfNext" aria-label="Next photo">▶</button>
             <span class="cf-count mono" id="cfCount"></span>
@@ -395,6 +396,10 @@
           <p class="mono cf-award" id="cfAward"></p>
           <h2 class="disp" id="cfTitle"></h2>
           <p class="cf-hook" id="cfHook"></p>
+          <div class="cf-demo" id="cfDemo" hidden>
+            <h3 class="mono">Full demo <span id="cfDemoLen"></span></h3>
+            <ol class="cf-chapters mono" id="cfChapters"></ol>
+          </div>
           <h3 class="mono">Overview</h3>
           <p id="cfOverview"></p>
           <div class="cf-broke" id="cfBroke">

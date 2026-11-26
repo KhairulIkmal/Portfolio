@@ -1491,6 +1491,10 @@ function initReel() {
 // Case files: a full-screen overlay per project with a photo gallery and the full story.
 // Photos are found automatically: assets/work/<slug>/01.jpg, 02.jpg, … (stops at the first gap).
 // Captions and "what broke" text are optional and live here.
+// video: a YouTube (unlisted) demo. id is the part after "watch?v=", length is shown on the button,
+// chapters are [time, label] pairs, e.g. ['1:40', 'Dashboard'].
+// A short muted loop for the card is found automatically at assets/work/<slug>/loop.mp4.
+//   'agroezuran': { captions: [], broke: '', video: { id: 'dQw4w9WgXcQ', length: '10:24', chapters: [['0:00', 'Login'], ['1:40', 'Dashboard']] } },
 const CASE_NOTES = {
   'agroezuran':     { captions: [], broke: '' },
   'dapur-kayu-mak': { captions: [], broke: '' },
@@ -1510,9 +1514,69 @@ function initCaseFiles() {
     broke: $('cfBroke'), brokeText: $('cfBrokeText'), tech: $('cfTech'), part: $('cfPart'), links: $('cfLinks'),
     stage: $('cfStage'), img: $('cfImg'), prev: $('cfPrev'), next: $('cfNext'), count: $('cfCount'),
     cap: $('cfCap'), thumbs: $('cfThumbs'), empty: $('cfEmpty'),
+    video: $('cfVideo'), demo: $('cfDemo'), demoLen: $('cfDemoLen'), chapters: $('cfChapters'),
   };
   const photoCache = {};
   let photos = [], idx = 0, current = null, opener = null, openedHere = false;
+  let vid = null, frame = null, playOnOpen = false;
+  const toSec = (t) => String(t).split(':').reduce((a, n) => a * 60 + Number(n), 0);
+
+  // YouTube player, loaded only when someone presses play (keeps the page fast).
+  const yt = (func, args = []) => frame && frame.contentWindow && frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+  function facade() {
+    frame = null;
+    ui.video.innerHTML = `<button type="button" class="cf-play"><img src="https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg" alt=""><i aria-hidden="true">▶</i><b class="mono">Play demo${vid.length ? ' · ' + vid.length : ''}</b></button>`;
+    ui.video.querySelector('button').setAttribute('aria-label', `Play the ${ui.title.textContent} demo video`);
+    ui.video.querySelector('button').addEventListener('click', () => play(0));
+  }
+  function play(start) {
+    if (photos[idx] !== 'video') show(0);
+    if (frame) { yt('seekTo', [start, true]); yt('playVideo'); return; }
+    const q = new URLSearchParams({ autoplay: 1, start, rel: 0, playsinline: 1, enablejsapi: 1, origin: location.origin });
+    frame = document.createElement('iframe');
+    frame.src = `https://www.youtube-nocookie.com/embed/${vid.id}?${q}`;
+    frame.title = `${ui.title.textContent} demo video`;
+    frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    frame.addEventListener('load', () => frame && frame.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'cf' }), '*'));
+    ui.video.innerHTML = '';
+    ui.video.appendChild(frame);
+    frame.focus();
+  }
+  // light up the chapter that is playing
+  addEventListener('message', (e) => {
+    if (!frame || e.source !== frame.contentWindow) return;
+    let d; try { d = JSON.parse(e.data); } catch { return; }
+    const t = d && d.info && d.info.currentTime;
+    if (typeof t !== 'number') return;
+    const btns = [...ui.chapters.querySelectorAll('button')];
+    let on = -1;
+    btns.forEach((b, k) => { if (t + 0.5 >= Number(b.dataset.t)) on = k; });
+    btns.forEach((b, k) => b.classList.toggle('on', k === on));
+  });
+  function fillDemo() {
+    ui.demo.hidden = !vid;
+    ui.chapters.innerHTML = '';
+    if (!vid) return;
+    ui.demoLen.textContent = vid.length ? '· ' + vid.length : '';
+    (vid.chapters || []).forEach(([t, label]) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button type="button" data-t="${toSec(t)}"><b>${t}</b><span></span></button>`;
+      li.querySelector('span').textContent = label;
+      li.querySelector('button').addEventListener('click', () => play(toSec(t)));
+      ui.chapters.appendChild(li);
+    });
+  }
+
+  // Cards with a demo get a second button.
+  Object.entries(CASE_NOTES).forEach(([slug, n]) => {
+    if (!n.video || !n.video.id) return;
+    const open = document.querySelector(`.card [data-open-case="${slug}"]`);
+    if (!open) return;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn'; b.dataset.openCase = slug; b.dataset.demo = '';
+    b.textContent = `▶ Watch demo${n.video.length ? ' · ' + n.video.length : ''}`;
+    open.after(b);
+  });
 
   // Find 01.jpg, 02.jpg, … for a project; resolves with the list of URLs that loaded.
   function findPhotos(slug) {
@@ -1534,11 +1598,22 @@ function initCaseFiles() {
 
   function show(i) {
     if (!photos.length) return;
+    const was = idx;
     idx = (i + photos.length) % photos.length;
-    ui.img.src = photos[idx];
+    const isVid = photos[idx] === 'video';
+    cf.classList.toggle('cf-on-video', isVid);
+    ui.video.hidden = !isVid;
+    if (photos[was] === 'video' && !isVid) yt('pauseVideo');
+    const p = idx - (vid ? 1 : 0);
     const caps = (CASE_NOTES[current] || {}).captions || [];
-    ui.img.alt = caps[idx] || `${ui.title.textContent}, photo ${idx + 1}`;
-    ui.cap.textContent = `Fig. ${idx + 1}${caps[idx] ? ' — ' + caps[idx] : ''}`;
+    if (isVid) {
+      if (!ui.video.firstChild) facade();
+      ui.cap.textContent = `Demo video${vid.length ? ' · ' + vid.length : ''}`;
+    } else {
+      ui.img.src = photos[idx];
+      ui.img.alt = caps[p] || `${ui.title.textContent}, photo ${p + 1}`;
+      ui.cap.textContent = `Fig. ${p + 1}${caps[p] ? ' — ' + caps[p] : ''}`;
+    }
     ui.count.textContent = `${String(idx + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}`;
     [...ui.thumbs.children].forEach((t, k) => t.setAttribute('aria-current', String(k === idx)));
   }
@@ -1565,25 +1640,34 @@ function initCaseFiles() {
     ui.broke.classList.toggle('cf-todo', !broke);
     ui.brokeText.textContent = broke || 'Author note: write a few lines on one real problem you hit in this project and how you fixed it.';
 
+    // demo video
+    const v = (CASE_NOTES[slug] || {}).video;
+    vid = v && v.id ? v : null;
+    frame = null; ui.video.innerHTML = ''; ui.video.hidden = true;
+    fillDemo();
+
     // gallery
-    photos = []; ui.thumbs.innerHTML = ''; ui.img.removeAttribute('src');
+    photos = []; idx = 0; ui.thumbs.innerHTML = ''; ui.img.removeAttribute('src');
     cf.classList.add('cf-loading'); cf.classList.remove('cf-nophotos');
     findPhotos(slug).then((list) => {
       if (current !== slug) return;
-      photos = list;
+      photos = vid ? ['video', ...list] : list;
       cf.classList.remove('cf-loading');
-      cf.classList.toggle('cf-nophotos', !list.length);
-      cf.classList.toggle('cf-single', list.length === 1);
-      ui.empty.textContent = DRAFT && !list.length ? `No photos yet. Add assets/work/${slug}/01.jpg, 02.jpg, 03.jpg …` : '';
-      list.forEach((src, k) => {
+      cf.classList.toggle('cf-nophotos', !photos.length);
+      cf.classList.toggle('cf-single', photos.length === 1);
+      ui.empty.textContent = DRAFT && !photos.length ? `No photos yet. Add assets/work/${slug}/01.jpg, 02.jpg, 03.jpg …` : '';
+      photos.forEach((src, k) => {
+        const isVid = src === 'video';
         const b = document.createElement('button');
-        b.type = 'button'; b.className = 'cf-thumb';
-        b.setAttribute('aria-label', `Photo ${k + 1}`);
-        b.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
+        b.type = 'button'; b.className = 'cf-thumb' + (isVid ? ' is-video' : '');
+        b.setAttribute('aria-label', isVid ? 'Demo video' : `Photo ${k + (vid ? 0 : 1)}`);
+        b.innerHTML = `<img src="${isVid ? `https://i.ytimg.com/vi/${vid.id}/default.jpg` : src}" alt="" loading="lazy">`;
         b.addEventListener('click', () => show(k));
         ui.thumbs.appendChild(b);
       });
       show(0);
+      if (playOnOpen && vid) play(0);
+      playOnOpen = false;
     });
     return true;
   }
@@ -1601,6 +1685,7 @@ function initCaseFiles() {
     document.documentElement.classList.remove('cf-open');
     cf.hidden = true;
     current = null;
+    frame = null; ui.video.innerHTML = ''; cf.classList.remove('cf-on-video');
     if (opener) { opener.focus({ preventScroll: true }); opener = null; }
   }
 
@@ -1616,6 +1701,7 @@ function initCaseFiles() {
 
   document.querySelectorAll('[data-open-case]').forEach((b) => b.addEventListener('click', () => {
     opener = b; openedHere = true;
+    playOnOpen = 'demo' in b.dataset;
     location.hash = `case-${b.dataset.openCase}`;
   }));
   cf.querySelectorAll('[data-cf-close]').forEach((el) => el.addEventListener('click', close));
@@ -1629,7 +1715,7 @@ function initCaseFiles() {
     else if (e.key === 'ArrowLeft') show(idx - 1);
     else if (e.key === 'Tab') {
       // keep focus inside the dialog
-      const f = [...cf.querySelectorAll('button:not([hidden]), a[href]')].filter((el) => el.offsetParent !== null);
+      const f = [...cf.querySelectorAll('button:not([hidden]), a[href], iframe')].filter((el) => el.offsetParent !== null);
       if (!f.length) return;
       if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
       else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
@@ -1647,6 +1733,32 @@ function initCaseFiles() {
   sync();
 }
 
+// A short muted loop on a project card, if assets/work/<slug>/loop.mp4 exists. Plays only while on screen.
+function initLoops() {
+  if (REDUCE || (navigator.connection && navigator.connection.saveData)) return;
+  document.querySelectorAll('.card [data-open-case]:not([data-demo])').forEach((b) => {
+    const card = b.closest('.card');
+    const fig = card.querySelector('.card-fig');
+    if (!fig) return;
+    let v = null, dead = false;
+    const io = new IntersectionObserver(([e]) => {
+      if (dead) return;
+      if (!e.isIntersecting) { if (v) v.pause(); return; }
+      if (v) { v.play().catch(() => {}); return; }
+      v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+      const img = fig.querySelector('img');
+      if (img && img.complete && img.naturalWidth) v.poster = img.src;
+      v.addEventListener('loadeddata', () => { fig.classList.remove('missing'); fig.classList.add('has-loop'); }, { once: true });
+      v.addEventListener('error', () => { dead = true; v.remove(); io.disconnect(); }, { once: true });
+      v.src = `assets/work/${b.dataset.openCase}/loop.mp4`;
+      fig.prepend(v);
+    }, { rootMargin: '200px 0px' });
+    io.observe(card);
+  });
+}
+
 function initUI() {
   initCounters();
   initTabs();
@@ -1656,6 +1768,7 @@ function initUI() {
   initGlobe();
   initReel();
   initCaseFiles();
+  initLoops();
 }
 
 initUI();

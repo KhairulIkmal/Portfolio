@@ -129,10 +129,16 @@ main, .bar, .foot { position: relative; z-index: 1; }
 .xp-list li { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); padding-left: 16px; position: relative; }
 .xp-list li::before { content: ""; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; background: var(--signal); }
 .xp-list b { color: var(--ink); font-weight: 600; }
-.card-fig { margin: 18px 0 0; aspect-ratio: 16 / 6; overflow: hidden; border: 1px solid var(--line); }
+.card-fig { position: relative; margin: 18px 0 0; aspect-ratio: 16 / 6; overflow: hidden; border: 1px solid var(--line); }
 .card-fig img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .card-fig figcaption { display: none; }
 .card-fig.missing { display: none; }
+/* a short muted loop on the card, framed like a scope screen */
+.card-fig video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.card-fig.has-loop img { display: none; }
+.card-fig.has-loop { border-color: #3a3d35; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+.card-fig.has-loop::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.45)); }
+.card-fig.has-loop::after { content: "● REC · DEMO LOOP"; position: absolute; left: 10px; top: 8px; font: 500 10px/1 var(--f-mono); letter-spacing: .08em; color: var(--signal); padding: 5px 7px; background: rgba(8,9,7,.78); pointer-events: none; }
 .draft .card-fig.missing { display: grid; place-items: center; border-style: dashed; border-color: var(--ink-3); background: repeating-linear-gradient(135deg, transparent 0 11px, rgba(237,233,224,.05) 11px 12px); }
 .draft .card-fig.missing figcaption { display: block; color: var(--ink-3); font-size: 11px; text-align: center; padding: 0 12px; }
 .sheet-head--sub { margin-top: 88px; }
@@ -470,6 +476,27 @@ main, .bar, .foot { position: relative; z-index: 1; }
 .cf-nav:hover { background: var(--signal); border-color: var(--signal); color: #111; }
 .cf-prev { left: 10px; } .cf-next { right: 10px; }
 .cf-count { position: absolute; top: 10px; right: 12px; color: var(--ink-3); }
+/* demo video: a poster with a play button until clicked, then a YouTube player */
+.cf-video { position: absolute; inset: 0; display: grid; place-items: center; background: #000; }
+.cf-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+.cf-play { position: relative; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; color: var(--ink); }
+.cf-play img { width: 100%; height: 100%; object-fit: contain; opacity: .55; transition: opacity .25s; }
+.cf-play:hover img { opacity: .75; }
+.cf-play i { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; display: grid; place-items: center; border-radius: 50%; background: var(--signal); color: #111; font-style: normal; font-size: 26px; padding-left: 5px; box-shadow: 0 0 0 10px rgba(255,90,31,.18), 0 10px 30px rgba(0,0,0,.6); transition: transform .2s; }
+.cf-play:hover i { transform: scale(1.08); }
+.cf-play b { position: absolute; left: 16px; bottom: 14px; font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); text-shadow: 0 1px 4px #000; }
+.cf-on-video .cf-stage img#cfImg { visibility: hidden; }
+.cf-thumb { position: relative; }
+.cf-thumb.is-video::after { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 16px; background: rgba(0,0,0,.35); }
+.cf-demo { margin-top: 18px; }
+.cf-demo h3 span { color: var(--ink-3); }
+.cf-chapters { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.cf-chapters button { width: 100%; min-height: 40px; display: flex; gap: 14px; align-items: baseline; text-align: left; padding: 9px 0; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; transition: color .2s, border-color .2s; }
+.cf-chapters button b { flex: none; width: 46px; font-weight: 500; color: var(--ink-3); }
+.cf-chapters button span { font-family: var(--f-body); font-size: 14.5px; }
+.cf-chapters button:hover { color: var(--ink); }
+.cf-chapters button.on { color: var(--ink); border-bottom-color: var(--signal); }
+.cf-chapters button.on b { color: var(--signal); }
 .cf-cap { margin: 0; color: var(--ink-2); min-height: 1.5em; }
 .cf-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; flex: none; }
 .cf-thumb { flex: none; width: 84px; height: 60px; padding: 0; border: 1px solid var(--line); background: #000; cursor: pointer; opacity: .55; transition: opacity .2s, border-color .2s; }
